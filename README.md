@@ -58,5 +58,5 @@ crossplane beta trace Bucket/test-resource-bucket-hash -o json | crossplane-expl
 
 - Re-do the `addNodes` feature
 - Understand why first render of statusbar is not rendering selected path without hack
-- Dynamic width for the tree table
 - Fix colouring flipping when highlighted
+- Fix issues with path not rendering values correctly
