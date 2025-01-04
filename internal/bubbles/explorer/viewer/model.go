@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/viewer"
+	"github.com/brunoluiz/crossplane-explorer/internal/ds"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -30,10 +31,19 @@ type ContentInput struct {
 	Trace *xplane.Resource
 }
 
-func (m *Model) SetContent(msg ContentInput) {
-	val, err := yaml.Marshal(msg.Trace.Unstructured.Object)
+func (m *Model) SetContent(msg ContentInput) error {
+	obj := msg.Trace.Unstructured.Object
+	ds.WalkMap(obj, func(key string, value interface{}) (interface{}, bool) {
+		// These fields are usually injected server side and make checking objects quite hard
+		if key == "managedFields" || keyHasSuffix(key, ".managedFields") {
+			return nil, false
+		}
+		return value, true
+	})
+
+	val, err := yaml.Marshal(obj)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	m.viewer.SetContent(viewer.ContentInput{
@@ -44,4 +54,13 @@ func (m *Model) SetContent(msg ContentInput) {
 			string(val),
 		)),
 	})
+	return nil
+}
+
+// Helper function to check if a key has a specific suffix
+func keyHasSuffix(key, suffix string) bool {
+	if len(key) < len(suffix) {
+		return false
+	}
+	return key[len(key)-len(suffix):] == suffix
 }

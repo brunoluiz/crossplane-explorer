@@ -18,7 +18,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case error:
-		m.err = msg
+		m.setIrrecoverableError(msg)
 		return m, nil
 	case *xplane.Resource:
 		cmd = m.onLoad(msg)
@@ -39,9 +39,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		*m.statusbar, statusCmd = m.statusbar.Update(msg)
 
 		return m, tea.Batch(cmd, statusCmd, treeCmd)
+	case PaneIrrecoverableError:
+		return m, cmd
 	}
 
-	return m, nil
+	return m, cmd
 }
 
 func (m *Model) onLoad(data *xplane.Resource) tea.Cmd {
@@ -81,9 +83,14 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 		clipboard.WriteAll(m.tree.Current().Value)
 	case "enter", "d":
 		v := m.resByNode[m.tree.Current()]
-		m.viewer.SetContent(viewer.ContentInput{
+		err := m.viewer.SetContent(viewer.ContentInput{
 			Trace: v,
 		})
+		if err != nil {
+			m.setIrrecoverableError(err)
+			return nil
+		}
+
 		m.pane = PaneSummary
 	case "q", "esc":
 		if m.pane == PaneTree {

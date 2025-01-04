@@ -37,8 +37,9 @@ const (
 type Pane string
 
 const (
-	PaneTree    Pane = "tree"
-	PaneSummary Pane = "summary"
+	PaneIrrecoverableError Pane = "error"
+	PaneTree               Pane = "tree"
+	PaneSummary            Pane = "summary"
 )
 
 type Tracer interface {
@@ -130,11 +131,9 @@ func (m Model) Init() tea.Cmd {
 }
 
 func (m Model) View() string {
-	if m.err != nil {
-		return fmt.Sprintf("There was a fatal error: %s\nPress q to exit", m.err.Error())
-	}
-
 	switch m.pane {
+	case PaneIrrecoverableError:
+		return fmt.Sprintf("There was a fatal error: %s\nPress q to exit", m.err.Error())
 	case PaneSummary:
 		return m.viewer.View()
 	case PaneTree:
@@ -228,4 +227,9 @@ func (m *Model) setNodes(data *xplane.Resource) {
 	addNodes(kind, data, nodes[0], resByNode)
 	m.tree.SetNodes(nodes)
 	m.resByNode = resByNode
+}
+
+func (m *Model) setIrrecoverableError(err error) {
+	m.err = err
+	m.pane = PaneIrrecoverableError
 }
