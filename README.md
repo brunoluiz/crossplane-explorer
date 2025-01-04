@@ -10,20 +10,20 @@
 
 `crossplane trace` is a very handy tool, but it is not very interactive and requires a few extra
 hops to properly debug its traced objects. This tool aims on closing this gap by providing
-an interactive tracing explorer based on the tool tracer output.
+an interactive tracing explorer based on the tracer output.
 
 ## ✨ Features
 
 ### Trace
 
-- ✨ Expanded details at a glance
-- 📋 Allow full object name yanking from selected items
-- 📖 Describe selected trace object details easily
-- ♻️ Automatic trace refresh
+- ✨ Expanded details at a glance, with highlight colouring for possible issues
+- 📖 Describe objects from the explorer, with no need to do it separately in kubectl
+- 📖 Clean object YAMLs without `managedFields` (useful on apply, not as much on describe/get)
+- 📋 Yank full qualified objects names straight from UI (API group + Kind + name)
+- ♻️ Automatic refresh
 
 ### Upcoming
 
-- Call Kubernetes API when describing object
 - Allow mutating resource annotations (pause, finaliser)
 
 ## 📀 Install
@@ -48,10 +48,10 @@ go install github.com/brunoluiz/crossplane-explorer@latest
 
 ## ⚙️ Usage
 
-You must have `crossplane` installed. Run the tracer with `-o json` and pipe it to this tool.
+You must have `crossplane` installed, since this application can run with any crossplane CLI version.
 
 ```
-crossplane beta trace Bucket/test-resource-bucket-hash -o json | crossplane-explorer trace
+crossplane-explorer trace -n namespace Object/hello-world
 ```
 
 ## 🧾 To-do
