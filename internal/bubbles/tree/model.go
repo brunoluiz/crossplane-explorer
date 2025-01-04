@@ -84,7 +84,7 @@ func (m Model) View() string {
 	return lipgloss.JoinVertical(lipgloss.Left, m.table.View(), help)
 }
 
-func (m *Model) SetNodes(nodes []*Node) tea.Cmd {
+func (m *Model) SetNodes(nodes []*Node) {
 	m.nodes = nodes
 
 	count := 0 // This is used to keep track of the index of the node we are on (important because we are using a recursive function)
@@ -92,8 +92,20 @@ func (m *Model) SetNodes(nodes []*Node) tea.Cmd {
 	m.renderTree(&rows, m.nodes, []string{}, 0, &count)
 	m.table.SetRows(rows)
 	m.table.Focus()
+}
 
-	return nil
+func (m *Model) SetColumns(cc []table.Column) {
+	m.table.SetColumns(cc)
+	cols := m.table.Columns()
+
+	// Adding `2` due to borders and all
+	if len(cols) > 2 {
+		w := 0
+		for _, col := range cols[:len(cols)-1] {
+			w += col.Width + 3
+		}
+		cols[len(cols)-1].Width = (m.width - w + 2)
+	}
 }
 
 func (m Model) ShortHelp() []key.Binding {

@@ -53,6 +53,12 @@ func (m *Model) onLoad(data *xplane.Resource) tea.Cmd {
 	}
 	resByNode := map[*tree.Node]*xplane.Resource{}
 	addNodes(data, nodes[0], resByNode)
+	switch {
+	case !m.short:
+		m.tree.SetColumns(m.getColumns(WideObjectColumnLayout))
+	case m.short:
+		m.tree.SetColumns(m.getColumns(ShortObjectColumnLayout))
+	}
 
 	m.tree.SetNodes(nodes)
 	m.resByNode = resByNode

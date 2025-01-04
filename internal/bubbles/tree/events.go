@@ -25,15 +25,8 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 	m.setSize(msg.Width, msg.Height)
 	m.table.SetWidth(msg.Width)
 	m.table.SetHeight(msg.Height)
-	cols := m.table.Columns()
-	w := 0
+	m.SetColumns(m.table.Columns())
 
-	// Adding `2` due to borders and all
-	for _, col := range cols[:len(cols)-1] {
-		w += col.Width + 2
-	}
-	w += 2
-	cols[len(cols)-1].Width = (msg.Width - w)
 	return nil
 }
 

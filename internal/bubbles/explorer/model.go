@@ -7,6 +7,7 @@ import (
 
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/explorer/statusbar"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/explorer/viewer"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/table"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/tree"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	tea "github.com/charmbracelet/bubbletea"
@@ -41,6 +42,7 @@ type Model struct {
 	tracer        Tracer
 	width         int
 	height        int
+	short         bool
 	watch         bool
 	watchInterval time.Duration
 	logger        *slog.Logger
@@ -64,6 +66,12 @@ func WithWatchInterval(t time.Duration) func(*Model) {
 	}
 }
 
+func WithShortColumns(enabled bool) func(*Model) {
+	return func(m *Model) {
+		m.short = enabled
+	}
+}
+
 func New(
 	logger *slog.Logger,
 	treeModel tree.Model,
@@ -81,6 +89,7 @@ func New(
 		width:         0,
 		height:        0,
 		watchInterval: 10 * time.Second,
+		short:         true,
 
 		pane:      PaneTree,
 		resByNode: map[*tree.Node]*xplane.Resource{},
@@ -126,5 +135,40 @@ func (m Model) View() string {
 		)
 	default:
 		return "No pane selected"
+	}
+}
+
+type ColumnLayout int
+
+const (
+	UnknownColumnLayout ColumnLayout = iota
+	ShortObjectColumnLayout
+	WideObjectColumnLayout
+	ShortPkgColumnLayout
+	WidePkgColumnLayout
+)
+
+func (m Model) getColumns(layout ColumnLayout) []table.Column {
+	switch layout {
+	case ShortObjectColumnLayout:
+		return []table.Column{
+			{Title: HeaderKeyObject, Width: 60},
+			{Title: HeaderKeyGroup, Width: 30},
+			{Title: HeaderKeySynced, Width: 7},
+			{Title: HeaderKeyReady, Width: 7},
+			{Title: HeaderKeyStatus, Width: 68},
+		}
+	case WideObjectColumnLayout:
+		return []table.Column{
+			{Title: HeaderKeyObject, Width: 60},
+			{Title: HeaderKeyGroup, Width: 30},
+			{Title: HeaderKeySynced, Width: 7},
+			{Title: HeaderKeySyncedLast, Width: 19},
+			{Title: HeaderKeyReady, Width: 7},
+			{Title: HeaderKeyReadyLast, Width: 19},
+			{Title: HeaderKeyStatus, Width: 68},
+		}
+	default:
+		return []table.Column{}
 	}
 }

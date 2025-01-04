@@ -32,6 +32,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 			&cli.StringFlag{Name: "cmd", Usage: "Which binary should it use to generate the JSON trace", Value: "crossplane beta trace -o json"},
 			&cli.StringFlag{Name: "namespace", Aliases: []string{"n", "ns"}, Usage: "Kubernetes namespace to be used"},
 			&cli.BoolFlag{Name: "stdin", Aliases: []string{"in"}, Usage: "Specify in case file is piped into stdin"},
+			&cli.BoolFlag{Name: "short", Usage: "Return short result columns for small screens"},
 			&cli.BoolFlag{Name: "watch", Aliases: []string{"w"}, Usage: "Refresh trace every 10 seconds"},
 			&cli.DurationFlag{Name: "watch-interval", Aliases: []string{"wi"}, Usage: "Refresh interval for the watcher feature", Value: 5 * time.Second},
 		},
@@ -45,15 +46,6 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				explorer.New(
 					slog.New(slog.NewTextHandler(f, &slog.HandlerOptions{})),
 					tree.New(table.New(
-						table.WithColumns([]table.Column{
-							{Title: explorer.HeaderKeyObject, Width: 60},
-							{Title: explorer.HeaderKeyGroup, Width: 30},
-							{Title: explorer.HeaderKeySynced, Width: 7},
-							{Title: explorer.HeaderKeySyncedLast, Width: 19},
-							{Title: explorer.HeaderKeyReady, Width: 7},
-							{Title: explorer.HeaderKeyReadyLast, Width: 19},
-							{Title: explorer.HeaderKeyStatus, Width: 68},
-						}),
 						table.WithFocused(true),
 						table.WithStyles(func() table.Styles {
 							s := table.DefaultStyles()
@@ -68,6 +60,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 					getTracer(c),
 					explorer.WithWatch(c.Bool("watch")),
 					explorer.WithWatchInterval(c.Duration("watch-interval")),
+					explorer.WithShortColumns(c.Bool("short")),
 				),
 				tea.WithAltScreen(),
 				tea.WithContext(ctx),
