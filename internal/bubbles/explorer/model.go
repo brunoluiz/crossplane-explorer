@@ -190,7 +190,7 @@ func (m Model) getColumns(layout ColumnLayout) []table.Column {
 		return []table.Column{
 			{Title: HeaderKeyObject, Width: 60},
 			{Title: HeaderKeyVersion, Width: 8},
-			{Title: HeaderKeyInstalled, Width: 7},
+			{Title: HeaderKeyInstalled, Width: 10},
 			{Title: HeaderKeyInstalledLast, Width: 19},
 			{Title: HeaderKeyHealthy, Width: 7},
 			{Title: HeaderKeyHealthyLast, Width: 19},

@@ -2,6 +2,7 @@ package xplane
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane/xpkg"
@@ -209,7 +210,7 @@ func GetPkgResourceStatus(r *Resource, name string) PkgResourceStatus {
 		HealthyLastTransition:   healthyCond.LastTransitionTime.Time,
 		State:                   mapEmptyStatusToDash(corev1.ConditionStatus(state)),
 		Status:                  status,
-		Ok:                      (installedCond.Status == corev1.ConditionTrue && healthyCond.Status == corev1.ConditionTrue),
+		Ok:                      (installedCond.Status == corev1.ConditionTrue && healthyCond.Status == corev1.ConditionTrue) || strings.HasPrefix(status, "Active") || strings.HasPrefix(status, "Healthy"),
 	}
 }
 

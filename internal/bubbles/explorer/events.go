@@ -121,9 +121,10 @@ func addNodes(kind schema.GroupKind, v *xplane.Resource, n *tree.Node, resByNode
 		n.Details = map[string]string{
 			HeaderKeyVersion:       resStatus.Version,
 			HeaderKeyInstalled:     resStatus.Installed,
-			HeaderKeyInstalledLast: resStatus.InstalledLastTransition.Format(time.RFC822),
+			HeaderKeyInstalledLast: getTimeStr(resStatus.InstalledLastTransition),
 			HeaderKeyHealthy:       resStatus.Healthy,
-			HeaderKeyHealthyLast:   resStatus.HealthyLastTransition.Format(time.RFC822),
+			HeaderKeyHealthyLast:   getTimeStr(resStatus.HealthyLastTransition),
+			HeaderKeyState:         resStatus.State,
 			HeaderKeyStatus:        resStatus.Status,
 		}
 		if !resStatus.Ok {
@@ -134,9 +135,9 @@ func addNodes(kind schema.GroupKind, v *xplane.Resource, n *tree.Node, resByNode
 		n.Details = map[string]string{
 			HeaderKeyGroup:      group,
 			HeaderKeySynced:     resStatus.Synced,
-			HeaderKeySyncedLast: resStatus.SyncedLastTransition.Format(time.RFC822),
+			HeaderKeySyncedLast: getTimeStr(resStatus.SyncedLastTransition),
 			HeaderKeyReady:      resStatus.Ready,
-			HeaderKeyReadyLast:  resStatus.ReadyLastTransition.Format(time.RFC822),
+			HeaderKeyReadyLast:  getTimeStr(resStatus.ReadyLastTransition),
 			HeaderKeyStatus:     resStatus.Status,
 		}
 		if !resStatus.Ok {
@@ -150,4 +151,11 @@ func addNodes(kind schema.GroupKind, v *xplane.Resource, n *tree.Node, resByNode
 		n.Children[k] = &tree.Node{}
 		addNodes(kind, cv, n.Children[k], resByNode)
 	}
+}
+
+func getTimeStr(t time.Time) string {
+	if t.IsZero() {
+		return "-"
+	}
+	return t.Format(time.RFC822)
 }
