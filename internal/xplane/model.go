@@ -12,6 +12,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	errv1 "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 // Resource resource trace model, extracted from crossplane CLI codebase
@@ -47,6 +48,10 @@ type ResourceStatus struct {
 	SyncedLastTransition time.Time
 	Status               string
 	Ok                   bool
+}
+
+func IsPkg(gk schema.GroupKind) bool {
+	return xpkg.IsPackageType(gk) || xpkg.IsPackageRevisionType(gk)
 }
 
 // getResourceStatus returns a string that represents an entire row of status

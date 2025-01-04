@@ -12,16 +12,26 @@ import (
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 const (
-	HeaderKeyObject     = "OBJECT"
+	HeaderKeyObject = "OBJECT"
+
+	HeaderKeyVersion       = "VERSION"
+	HeaderKeyInstalled     = "INSTALLED"
+	HeaderKeyInstalledLast = "INSTALLED LAST"
+	HeaderKeyHealthy       = "HEALTHY"
+	HeaderKeyHealthyLast   = "HEALTHY LAST"
+	HeaderKeyState         = "STATE"
+
 	HeaderKeyGroup      = "GROUP"
 	HeaderKeySynced     = "SYNCED"
 	HeaderKeySyncedLast = "SYNCED LAST"
 	HeaderKeyReady      = "READY"
 	HeaderKeyReadyLast  = "READY LAST"
-	HeaderKeyStatus     = "STATUS"
+
+	HeaderKeyStatus = "STATUS"
 )
 
 type Pane string
@@ -168,7 +178,54 @@ func (m Model) getColumns(layout ColumnLayout) []table.Column {
 			{Title: HeaderKeyReadyLast, Width: 19},
 			{Title: HeaderKeyStatus, Width: 68},
 		}
+	case ShortPkgColumnLayout:
+		return []table.Column{
+			{Title: HeaderKeyObject, Width: 60},
+			{Title: HeaderKeyVersion, Width: 8},
+			{Title: HeaderKeyInstalled, Width: 8},
+			{Title: HeaderKeyHealthy, Width: 7},
+			{Title: HeaderKeyState, Width: 7},
+			{Title: HeaderKeyStatus, Width: 68},
+		}
+	case WidePkgColumnLayout:
+		return []table.Column{
+			{Title: HeaderKeyObject, Width: 60},
+			{Title: HeaderKeyVersion, Width: 8},
+			{Title: HeaderKeyInstalled, Width: 7},
+			{Title: HeaderKeyInstalledLast, Width: 19},
+			{Title: HeaderKeyHealthy, Width: 7},
+			{Title: HeaderKeyHealthyLast, Width: 19},
+			{Title: HeaderKeyState, Width: 7},
+			{Title: HeaderKeyStatus, Width: 68},
+		}
 	default:
 		return []table.Column{}
 	}
+}
+
+func (m *Model) setColumns(gk schema.GroupKind) {
+	isPkg := xplane.IsPkg(gk)
+	isRes, isWide, isShort := !isPkg, !m.short, m.short
+
+	switch {
+	case isPkg && isShort:
+		m.tree.SetColumns(m.getColumns(ShortPkgColumnLayout))
+	case isPkg && isWide:
+		m.tree.SetColumns(m.getColumns(WidePkgColumnLayout))
+	case isRes && isShort:
+		m.tree.SetColumns(m.getColumns(ShortObjectColumnLayout))
+	case isRes && isWide:
+		m.tree.SetColumns(m.getColumns(WideObjectColumnLayout))
+	}
+}
+
+func (m *Model) setNodes(data *xplane.Resource) {
+	nodes := []*tree.Node{
+		{Key: "root", Children: make([]*tree.Node, 1)},
+	}
+	resByNode := map[*tree.Node]*xplane.Resource{}
+	kind := data.Unstructured.GroupVersionKind().GroupKind()
+	addNodes(kind, data, nodes[0], resByNode)
+	m.tree.SetNodes(nodes)
+	m.resByNode = resByNode
 }

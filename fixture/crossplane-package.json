@@ -1,0 +1,201 @@
+{
+  "object": {
+    "apiVersion": "pkg.crossplane.io/v1",
+    "kind": "Configuration",
+    "metadata": {
+      "name": "platform-ref-aws"
+    },
+    "spec": {
+      "package": "xpkg.upbound.io/upbound/platform-ref-aws:v0.9.0"
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2025-01-04T12:33:58Z",
+          "reason": "ActivePackageRevision",
+          "status": "True",
+          "type": "Installed"
+        },
+        {
+          "lastTransitionTime": "2025-01-04T12:33:58Z",
+          "reason": "HealthyPackageRevision",
+          "status": "True",
+          "type": "Healthy"
+        }
+      ]
+    }
+  },
+  "children": [
+    {
+      "object": {
+        "apiVersion": "pkg.crossplane.io/v1",
+        "kind": "ConfigurationRevision",
+        "metadata": {
+          "name": "platform-ref-aws-9ad7b5db2899"
+        },
+        "spec": {
+          "desiredState": "Active",
+          "image": "xpkg.upbound.io/upbound/platform-ref-aws:v0.9.0"
+        },
+        "status": {
+          "conditions": [
+            {
+              "lastTransitionTime": "2025-01-04T12:33:58Z",
+              "reason": "ActivePackageRevision",
+              "status": "True",
+              "type": "Installed"
+            },
+            {
+              "lastTransitionTime": "2025-01-04T12:33:58Z",
+              "reason": "HealthyPackageRevision",
+              "status": "True",
+              "type": "Healthy"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "object": {
+        "apiVersion": "pkg.crossplane.io/v1",
+        "kind": "Configuration",
+        "metadata": {
+          "name": "upbound-configuration-aws-network"
+        },
+        "spec": {
+          "package": "xpkg.upbound.io/upbound/configuration-aws-network:v0.7.0"
+        },
+        "status": {
+          "conditions": [
+            {
+              "lastTransitionTime": "2025-01-04T12:33:58Z",
+              "reason": "ActivePackageRevision",
+              "status": "True",
+              "type": "Installed"
+            },
+            {
+              "lastTransitionTime": "2025-01-04T12:33:58Z",
+              "reason": "HealthyPackageRevision",
+              "status": "True",
+              "type": "Healthy"
+            }
+          ]
+        }
+      },
+      "children": [
+        {
+          "object": {
+            "apiVersion": "pkg.crossplane.io/v1",
+            "kind": "ConfigurationRevision",
+            "metadata": {
+              "name": "upbound-configuration-aws-network-97be9100cfe1"
+            },
+            "spec": {
+              "desiredState": "Active",
+              "image": "xpkg.upbound.io/upbound/configuration-aws-network:v0.7.0"
+            },
+            "status": {
+              "conditions": [
+                {
+                  "lastTransitionTime": "2025-01-04T12:33:58Z",
+                  "reason": "ActivePackageRevision",
+                  "status": "True",
+                  "type": "Installed"
+                },
+                {
+                  "lastTransitionTime": "2025-01-04T12:33:58Z",
+                  "reason": "HealthyPackageRevision",
+                  "status": "True",
+                  "type": "Healthy"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "object": {
+            "apiVersion": "pkg.crossplane.io/v1",
+            "kind": "Provider",
+            "metadata": {
+              "name": "upbound-provider-aws-ec2"
+            },
+            "spec": {
+              "package": "xpkg.upbound.io/upbound/provider-aws-ec2:v0.47.0"
+            },
+            "status": {
+              "conditions": [
+                {
+                  "lastTransitionTime": "2025-01-04T12:33:58Z",
+                  "reason": "ActivePackageRevision",
+                  "status": "True",
+                  "type": "Installed"
+                },
+                {
+                  "lastTransitionTime": "2025-01-04T12:33:58Z",
+                  "message": "cannot resolve package dependencies: incompatible dependencies: [xpkg.upbound.io/crossplane-contrib/provider-helm xpkg.upbound.io/crossplane-contrib/provider-kubernetes]",
+                  "reason": "UnknownPackageRevisionHealth",
+                  "status": "Unknown",
+                  "type": "Healthy"
+                }
+              ]
+            }
+          },
+          "children": [
+            {
+              "object": {
+                "apiVersion": "pkg.crossplane.io/v1",
+                "kind": "ProviderRevision",
+                "metadata": {
+                  "name": "upbound-provider-aws-ec2-9ad7b5db2899"
+                },
+                "spec": {
+                  "desiredState": "Active",
+                  "image": "xpkg.upbound.io/upbound/provider-aws-ec2:v0.47.0"
+                },
+                "status": {
+                  "conditions": [
+                    {
+                      "lastTransitionTime": "2025-01-04T12:33:58Z",
+                      "reason": "ActivePackageRevision",
+                      "status": "True",
+                      "type": "Installed"
+                    },
+                    {
+                      "lastTransitionTime": "2025-01-04T12:33:58Z",
+                      "message": "post establish runtime hook failed for package: provider package deployment has no condition of type \"Available\" yet",
+                      "reason": "UnhealthyPackageRevision",
+                      "status": "False",
+                      "type": "Healthy"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "object": {
+                "apiVersion": "pkg.crossplane.io/v1",
+                "kind": "Provider",
+                "metadata": {
+                  "name": "upbound-provider-aws-something"
+                },
+                "spec": {
+                  "package": "xpkg.upbound.io/upbound/provider-aws-something:v0.47.0"
+                },
+                "status": {
+                  "conditions": [
+                    {
+                      "lastTransitionTime": "2025-01-04T12:33:58Z",
+                      "reason": "ActivePackageRevision",
+                      "status": "True",
+                      "type": "Installed"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -185,28 +185,6 @@
                       ]
                     }
                   }
-                },
-                {
-                  "object": {
-                    "apiVersion": "test.cloud/v1alpha1",
-                    "kind": "User",
-                    "metadata": {
-                      "annotations": {
-                        "crossplane.io/composition-resource-name": ""
-                      },
-                      "name": "test-resource-child-2-2-bucket-hash"
-                    },
-                    "status": {
-                      "conditions": [
-                        {
-                          "lastTransitionTime": null,
-                          "reason": "",
-                          "status": "True",
-                          "type": "Synced"
-                        }
-                      ]
-                    }
-                  }
                 }
               ]
             }
@@ -217,10 +195,7 @@
             "apiVersion": "test.cloud/v1alpha1",
             "kind": "User",
             "metadata": {
-              "name": "test-resource-user-hash",
-              "annotations": {
-                "crossplane.io/paused": "true"
-              }
+              "name": "test-resource-user-hash"
             },
             "status": {
               "conditions": [
