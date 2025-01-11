@@ -43,10 +43,13 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				return err
 			}
 
+			logger := slog.New(slog.NewTextHandler(f, &slog.HandlerOptions{}))
+
 			app := tea.NewProgram(
 				explorer.New(
-					slog.New(slog.NewTextHandler(f, &slog.HandlerOptions{})),
+					logger,
 					tree.New(
+						logger,
 						table.New(
 							table.WithFocused(true),
 							table.WithStyles(func() table.Styles {

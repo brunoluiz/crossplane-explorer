@@ -78,12 +78,15 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 		return tea.Interrupt
 	case "y":
 		//nolint // ignore errors
-		clipboard.WriteAll(m.tree.Current().Value)
+		clipboard.WriteAll(m.tree.Current().Key)
 	case "enter", "d":
-		v := m.resByNode[m.tree.Current()]
-		err := m.viewer.SetContent(viewer.ContentInput{
-			Trace: v,
-		})
+		curr := m.tree.Current().Value
+		trace, ok := curr.(*xplane.Resource)
+		if !ok {
+			return nil
+		}
+
+		err := m.viewer.SetContent(viewer.ContentInput{Trace: trace})
 		if err != nil {
 			m.setIrrecoverableError(err)
 			return nil
@@ -101,16 +104,16 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	return nil
 }
 
-func addNodes(kind schema.GroupKind, v *xplane.Resource, n *tree.Node, resByNode map[*tree.Node]*xplane.Resource) {
+func addNodes(kind schema.GroupKind, v *xplane.Resource, n *tree.Node) {
 	name := fmt.Sprintf("%s/%s", v.Unstructured.GetKind(), v.Unstructured.GetName())
 	group := v.Unstructured.GetObjectKind().GroupVersionKind().Group
 
-	n.Key = name
-	n.Value = fmt.Sprintf("%s.%s/%s", v.Unstructured.GetKind(), group, v.Unstructured.GetName())
-	n.Children = make([]*tree.Node, len(v.Children))
+	n.Label = name
+	n.Key = fmt.Sprintf("%s.%s/%s", v.Unstructured.GetKind(), group, v.Unstructured.GetName())
+	n.Children = make([]tree.Node, len(v.Children))
 
 	if v.Unstructured.GetAnnotations()["crossplane.io/paused"] == "true" {
-		n.Key += " (paused)"
+		n.Label += " (paused)"
 		n.Color = lipgloss.ANSIColor(ansi.Yellow)
 	}
 
@@ -142,12 +145,11 @@ func addNodes(kind schema.GroupKind, v *xplane.Resource, n *tree.Node, resByNode
 			n.Color = lipgloss.ANSIColor(ansi.Red)
 		}
 	}
-
-	resByNode[n] = v
+	n.Value = v
 
 	for k, cv := range v.Children {
-		n.Children[k] = &tree.Node{}
-		addNodes(kind, cv, n.Children[k], resByNode)
+		n.Children[k] = tree.Node{}
+		addNodes(kind, cv, &n.Children[k])
 	}
 }
 

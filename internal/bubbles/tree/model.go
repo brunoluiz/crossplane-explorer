@@ -1,6 +1,7 @@
 package tree
 
 import (
+	"log/slog"
 	"strings"
 	"time"
 
@@ -25,14 +26,16 @@ type ColorConfig struct {
 }
 
 type Node struct {
-	Key     string
-	Value   string
+	Key   string
+	Value any
+
+	Label   string
 	Details map[string]string
 
 	Selected ColorConfig
 	Color    lipgloss.TerminalColor
 
-	Children []*Node
+	Children []Node
 	Path     []string
 }
 
@@ -42,10 +45,11 @@ type Model struct {
 	Help      help.Model
 	table     table.Model
 	statusbar statusbar.Model
+	logger    *slog.Logger
 
 	width         int
 	height        int
-	nodes         []*Node
+	nodes         []Node
 	nodesByCursor map[int]*Node
 	cursor        int
 
@@ -53,10 +57,12 @@ type Model struct {
 }
 
 func New(
+	l *slog.Logger,
 	t table.Model,
 	s statusbar.Model,
 ) Model {
 	return Model{
+		logger:    l,
 		table:     t,
 		statusbar: s,
 		KeyMap:    DefaultKeyMap(),
@@ -94,7 +100,7 @@ func (m Model) View() string {
 	)
 }
 
-func (m *Model) SetNodes(nodes []*Node) {
+func (m *Model) SetNodes(nodes []Node) {
 	m.nodes = nodes
 
 	count := 0 // This is used to keep track of the index of the node we are on (important because we are using a recursive function)
@@ -146,15 +152,15 @@ func (m Model) FullHelp() [][]key.Binding {
 		})
 }
 
-func (m Model) Current() *Node             { return m.nodesByCursor[m.cursor] }
+func (m Model) Current() Node              { return *m.nodesByCursor[m.cursor] }
 func (m *Model) SetShowHelp() bool         { return m.showHelp }
 func (m *Model) setSize(width, height int) { m.width = width; m.height = height }
 
 func (m *Model) numberOfNodes() int {
 	count := 0
 
-	var countNodes func([]*Node)
-	countNodes = func(nodes []*Node) {
+	var countNodes func([]Node)
+	countNodes = func(nodes []Node) {
 		for _, node := range nodes {
 			count++
 			if node.Children != nil {
@@ -168,10 +174,11 @@ func (m *Model) numberOfNodes() int {
 	return count
 }
 
-func (m *Model) renderTree(rows *[]table.Row, remainingNodes []*Node, path []string, indent int, count *int) {
+func (m *Model) renderTree(rows *[]table.Row, remainingNodes []Node, path []string, indent int, count *int) {
 	const treeNodePrefix string = " └─"
 
-	for _, node := range remainingNodes {
+	for _, n := range remainingNodes {
+		node := &n
 		// If we aren't at the root, we add the arrow shape to the string
 		shape := ""
 		if indent > 0 {
@@ -187,7 +194,7 @@ func (m *Model) renderTree(rows *[]table.Row, remainingNodes []*Node, path []str
 			s = s.Foreground(node.Color)
 		}
 
-		cols := []table.Cell{{Value: shape + node.Key, Style: s}}
+		cols := []table.Cell{{Value: shape + node.Label, Style: s}}
 		for _, v := range m.table.Columns()[1:] {
 			cols = append(cols, table.Cell{Value: node.Details[v.Title], Style: s})
 		}
@@ -196,8 +203,10 @@ func (m *Model) renderTree(rows *[]table.Row, remainingNodes []*Node, path []str
 		m.nodesByCursor[idx] = node
 
 		// Used to be able to trace back the path on the tree
-		node.Path = path
-		node.Path = append(node.Path, node.Key)
+		cpy := make([]string, len(path))
+		copy(cpy, path)
+		node.Path = append(cpy, node.Label)
+		m.logger.Info(node.Key, "path", node.Path)
 
 		if node.Children != nil {
 			m.renderTree(rows, node.Children, node.Path, indent+1, count)

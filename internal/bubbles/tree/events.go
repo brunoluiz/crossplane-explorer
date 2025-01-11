@@ -18,7 +18,10 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var tableCmd tea.Cmd
 	m.table, tableCmd = m.table.Update(msg)
 
-	return m, tea.Batch(cmd, tableCmd)
+	var statusBarCmd tea.Cmd
+	m.statusbar, statusBarCmd = m.statusbar.Update(msg)
+
+	return m, tea.Batch(cmd, tableCmd, statusBarCmd)
 }
 
 func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
@@ -38,7 +41,7 @@ func (m *Model) onNavUp() {
 	if m.cursor < 0 {
 		m.cursor = 0
 	}
-	m.onSelectionChange(m.nodesByCursor[m.cursor])
+	m.onSelectionChange(*m.nodesByCursor[m.cursor])
 }
 
 func (m *Model) onNavDown() {
@@ -46,10 +49,10 @@ func (m *Model) onNavDown() {
 	if m.cursor >= m.numberOfNodes() {
 		m.cursor = m.numberOfNodes() - 1
 	}
-	m.onSelectionChange(m.nodesByCursor[m.cursor])
+	m.onSelectionChange(*m.nodesByCursor[m.cursor])
 }
 
-func (m *Model) onSelectionChange(node *Node) {
+func (m *Model) onSelectionChange(node Node) {
 	m.statusbar.SetPath(node.Path)
 }
 
