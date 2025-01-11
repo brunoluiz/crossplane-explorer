@@ -30,6 +30,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 		Flags: []cli.Flag{
 			&cli.StringFlag{Name: "log", Aliases: []string{"l"}, Usage: "Log destination", Value: "crossplane-explorer.trace.log"},
 			&cli.StringFlag{Name: "cmd", Usage: "Which binary should it use to generate the JSON trace", Value: "crossplane beta trace -o json"},
+			&cli.StringFlag{Name: "context", Aliases: []string{"ctx"}, Usage: "Kubernetes context to be used"},
 			&cli.StringFlag{Name: "namespace", Aliases: []string{"n", "ns"}, Usage: "Kubernetes namespace to be used"},
 			&cli.BoolFlag{Name: "stdin", Aliases: []string{"in"}, Usage: "Specify in case file is piped into stdin"},
 			&cli.BoolFlag{Name: "short", Usage: "Return short result columns for small screens"},
@@ -80,6 +81,7 @@ func getTracer(c *cli.Command) explorer.Tracer {
 	return xplane.NewCLITraceQuerier(
 		c.String("cmd"),
 		c.String("namespace"),
+		c.String("context"),
 		c.Args().First(),
 	)
 }
