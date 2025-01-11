@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/samber/lo"
 )
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
@@ -48,6 +49,8 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 		m.viewport.Style = m.styles.Viewport
 		m.viewport.YPosition = headerHeight
 		m.viewport.HighPerformanceRendering = m.useHighPerformanceRenderer
+		m.viewport.KeyMap.PageUp.SetKeys(lo.Flatten([][]string{{"ctrl+b"}, m.viewport.KeyMap.PageUp.Keys()})...)
+		m.viewport.KeyMap.PageDown.SetKeys(lo.Flatten([][]string{{"ctrl+f"}, m.viewport.KeyMap.PageDown.Keys()})...)
 		m.viewport.SetContent(m.content)
 		m.ready = true
 
