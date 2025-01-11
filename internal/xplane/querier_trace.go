@@ -17,7 +17,7 @@ func NewCLITraceQuerier(cmd string, namespace string, name string) *CLITraceQuer
 	s := strings.Split(cmd, " ")
 	app := s[0]
 	args := s[1:]
-	if namespace != "" {
+	if namespace != "" && namespace != "-" {
 		args = append(args, "--namespace", namespace)
 	}
 	args = append(args, name)
