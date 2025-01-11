@@ -27,7 +27,10 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 	m.table.SetHeight(msg.Height)
 	m.SetColumns(m.table.Columns())
 
-	return nil
+	var statusbarCmd tea.Cmd
+	m.statusbar, statusbarCmd = m.statusbar.Update(msg)
+
+	return statusbarCmd
 }
 
 func (m *Model) onNavUp() {
@@ -47,10 +50,7 @@ func (m *Model) onNavDown() {
 }
 
 func (m *Model) onSelectionChange(node *Node) {
-	if m.OnSelectionChange == nil {
-		return
-	}
-	m.OnSelectionChange(node)
+	m.statusbar.SetPath(node.Path)
 }
 
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {

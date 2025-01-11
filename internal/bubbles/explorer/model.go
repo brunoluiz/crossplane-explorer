@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/explorer/statusbar"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/explorer/viewer"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/table"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/tree"
@@ -48,7 +47,6 @@ type Tracer interface {
 
 type Model struct {
 	tree          tree.Model
-	statusbar     *statusbar.Model // requires pointer here
 	viewer        viewer.Model
 	tracer        Tracer
 	width         int
@@ -87,14 +85,12 @@ func New(
 	logger *slog.Logger,
 	treeModel tree.Model,
 	viewerModel viewer.Model,
-	statusbarModel statusbar.Model,
 	tracer Tracer,
 	opts ...WithOpt,
 ) *Model {
 	m := &Model{
 		logger:        logger,
 		tree:          treeModel,
-		statusbar:     &statusbarModel,
 		viewer:        viewerModel,
 		tracer:        tracer,
 		width:         0,
@@ -104,9 +100,6 @@ func New(
 
 		pane:      PaneTree,
 		resByNode: map[*tree.Node]*xplane.Resource{},
-	}
-	m.tree.OnSelectionChange = func(n *tree.Node) {
-		m.statusbar.SetPath(n.Path)
 	}
 
 	for _, opt := range opts {
@@ -139,8 +132,7 @@ func (m Model) View() string {
 	case PaneTree:
 		return lipgloss.JoinVertical(
 			lipgloss.Left,
-			lipgloss.NewStyle().Height(m.height-m.statusbar.GetHeight()).Render(m.tree.View()),
-			m.statusbar.View(),
+			m.tree.View(),
 		)
 	default:
 		return "No pane selected"

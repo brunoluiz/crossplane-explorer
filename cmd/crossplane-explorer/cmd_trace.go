@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/explorer"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/explorer/statusbar"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/explorer/viewer"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/table"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/tree"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/tree/statusbar"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -46,18 +46,20 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 			app := tea.NewProgram(
 				explorer.New(
 					slog.New(slog.NewTextHandler(f, &slog.HandlerOptions{})),
-					tree.New(table.New(
-						table.WithFocused(true),
-						table.WithStyles(func() table.Styles {
-							s := table.DefaultStyles()
-							s.Selected = lipgloss.NewStyle().
-								Foreground(lipgloss.ANSIColor(ansi.Black)).
-								Background(lipgloss.ANSIColor(ansi.White))
-							return s
-						}()),
-					)),
+					tree.New(
+						table.New(
+							table.WithFocused(true),
+							table.WithStyles(func() table.Styles {
+								s := table.DefaultStyles()
+								s.Selected = lipgloss.NewStyle().
+									Foreground(lipgloss.ANSIColor(ansi.Black)).
+									Background(lipgloss.ANSIColor(ansi.White))
+								return s
+							}()),
+						),
+						statusbar.New(),
+					),
 					viewer.New(),
-					statusbar.New(),
 					getTracer(c),
 					explorer.WithWatch(c.Bool("watch")),
 					explorer.WithWatchInterval(c.Duration("watch-interval")),

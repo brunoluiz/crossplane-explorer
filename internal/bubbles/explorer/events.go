@@ -36,7 +36,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case PaneTree:
 		var treeCmd, statusCmd tea.Cmd
 		m.tree, treeCmd = m.tree.Update(msg)
-		*m.statusbar, statusCmd = m.statusbar.Update(msg)
 
 		return m, tea.Batch(cmd, statusCmd, treeCmd)
 	case PaneIrrecoverableError:
@@ -68,7 +67,6 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 
 	top, right, _, left := lipgloss.NewStyle().Padding(1).GetPadding()
 	m.tree, _ = m.tree.Update(tea.WindowSizeMsg{Width: m.width - right - left, Height: m.height - top})
-	*m.statusbar, _ = m.statusbar.Update(msg)
 	m.viewer, _ = m.viewer.Update(msg)
 
 	return nil

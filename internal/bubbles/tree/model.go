@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/table"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/tree/statusbar"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -36,13 +37,11 @@ type Node struct {
 }
 
 type Model struct {
-	KeyMap KeyMap
-	Styles Styles
-	Help   help.Model
-	table  table.Model
-
-	OnSelectionChange func(node *Node)
-	OnYank            func(node *Node)
+	KeyMap    KeyMap
+	Styles    Styles
+	Help      help.Model
+	table     table.Model
+	statusbar statusbar.Model
 
 	width         int
 	height        int
@@ -53,11 +52,15 @@ type Model struct {
 	showHelp bool
 }
 
-func New(t table.Model) Model {
+func New(
+	t table.Model,
+	s statusbar.Model,
+) Model {
 	return Model{
-		table:  t,
-		KeyMap: DefaultKeyMap(),
-		Styles: DefaultStyles(),
+		table:     t,
+		statusbar: s,
+		KeyMap:    DefaultKeyMap(),
+		Styles:    DefaultStyles(),
 
 		width:         0,
 		height:        0,
@@ -80,8 +83,15 @@ func (m Model) View() string {
 		help = m.helpView()
 		availableHeight -= lipgloss.Height(help)
 	}
+
+	availableHeight -= m.statusbar.GetHeight()
 	m.table.SetHeight(availableHeight)
-	return lipgloss.JoinVertical(lipgloss.Left, m.table.View(), help)
+
+	return lipgloss.JoinVertical(lipgloss.Left,
+		lipgloss.NewStyle().Height(m.height-m.statusbar.GetHeight()).Render(m.table.View()),
+		help,
+		m.statusbar.View(),
+	)
 }
 
 func (m *Model) SetNodes(nodes []*Node) {
