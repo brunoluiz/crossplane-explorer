@@ -41,7 +41,7 @@ func (m *Model) onNavUp() {
 	if m.cursor < 0 {
 		m.cursor = 0
 	}
-	m.onSelectionChange(*m.nodesByCursor[m.cursor])
+	m.onSelectionChange(m.nodesByCursor[m.cursor])
 }
 
 func (m *Model) onNavDown() {
@@ -49,11 +49,11 @@ func (m *Model) onNavDown() {
 	if m.cursor >= m.numberOfNodes() {
 		m.cursor = m.numberOfNodes() - 1
 	}
-	m.onSelectionChange(*m.nodesByCursor[m.cursor])
+	m.onSelectionChange(m.nodesByCursor[m.cursor])
 }
 
-func (m *Model) onSelectionChange(node Node) {
-	m.statusbar.SetPath(node.Path)
+func (m *Model) onSelectionChange(node *Node) {
+	m.statusbar.SetPath(m.pathByNode[node])
 }
 
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {

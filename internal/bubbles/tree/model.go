@@ -36,7 +36,6 @@ type Node struct {
 	Color    lipgloss.TerminalColor
 
 	Children []Node
-	Path     []string
 }
 
 type Model struct {
@@ -51,6 +50,7 @@ type Model struct {
 	height        int
 	nodes         []Node
 	nodesByCursor map[int]*Node
+	pathByNode    map[*Node][]string
 	cursor        int
 
 	showHelp bool
@@ -71,6 +71,7 @@ func New(
 		width:         0,
 		height:        0,
 		nodesByCursor: map[int]*Node{},
+		pathByNode:    map[*Node][]string{},
 
 		showHelp: true,
 		Help:     help.New(),
@@ -174,11 +175,10 @@ func (m *Model) numberOfNodes() int {
 	return count
 }
 
-func (m *Model) renderTree(rows *[]table.Row, remainingNodes []Node, path []string, indent int, count *int) {
+func (m *Model) renderTree(rows *[]table.Row, remainingNodes []Node, currentPath []string, indent int, count *int) {
 	const treeNodePrefix string = " └─"
 
-	for _, n := range remainingNodes {
-		node := &n
+	for _, node := range remainingNodes {
 		// If we aren't at the root, we add the arrow shape to the string
 		shape := ""
 		if indent > 0 {
@@ -200,16 +200,16 @@ func (m *Model) renderTree(rows *[]table.Row, remainingNodes []Node, path []stri
 		}
 
 		*rows = append(*rows, cols)
-		m.nodesByCursor[idx] = node
+		m.nodesByCursor[idx] = &node
 
 		// Used to be able to trace back the path on the tree
-		cpy := make([]string, len(path))
-		copy(cpy, path)
-		node.Path = append(cpy, node.Label)
-		m.logger.Info(node.Key, "path", node.Path)
+		path := make([]string, len(currentPath))
+		copy(path, currentPath)
+		path = append(path, node.Label)
+		m.pathByNode[&node] = path
 
 		if node.Children != nil {
-			m.renderTree(rows, node.Children, node.Path, indent+1, count)
+			m.renderTree(rows, node.Children, path, indent+1, count)
 		}
 	}
 }
