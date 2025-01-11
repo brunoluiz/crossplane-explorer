@@ -56,10 +56,9 @@ crossplane-explorer trace -n namespace Object/hello-world
 
 ## 🧾 To-do
 
-- Re-do the `addNodes` feature
 - Understand why first render of statusbar is not rendering selected path without hack
+- Add search on the viewer
 - Fix colouring flipping when highlighted
-- Fix issues with path not rendering values correctly
 - Refactor bubbles package to be more domain driven or fit the hexagonal architecture
 - Open issue around issues on colour rendering on tables bubbles (reason why I had to fork)
 - Open issue at crossplane so people can use their tracing parsers
