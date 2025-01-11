@@ -109,6 +109,11 @@ func (m *Model) SetNodes(nodes []Node) {
 	m.renderTree(&rows, m.nodes, []string{}, 0, &count)
 	m.table.SetRows(rows)
 	m.table.Focus()
+
+	// Set the path to the first item, since it will only render further values on cursor change
+	if m.cursor == 0 {
+		m.statusbar.SetPath([]string{nodes[0].Label})
+	}
 }
 
 func (m *Model) SetColumns(cc []table.Column) {

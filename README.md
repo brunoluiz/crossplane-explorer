@@ -56,7 +56,6 @@ crossplane-explorer trace -n namespace Object/hello-world
 
 ## 🧾 To-do
 
-- Understand why first render of statusbar is not rendering selected path without hack
 - Add search on the viewer
 - Fix colouring flipping when highlighted
 - Refactor bubbles package to be more domain driven or fit the hexagonal architecture
