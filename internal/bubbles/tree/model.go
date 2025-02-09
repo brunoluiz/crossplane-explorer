@@ -134,8 +134,8 @@ func (m Model) ShortHelp() []key.Binding {
 	kb := []key.Binding{
 		m.KeyMap.Up,
 		m.KeyMap.Down,
-		m.KeyMap.Yank,
-		m.KeyMap.Describe,
+		m.KeyMap.Copy,
+		m.KeyMap.Show,
 	}
 
 	return append(kb,
@@ -147,8 +147,8 @@ func (m Model) FullHelp() [][]key.Binding {
 	kb := [][]key.Binding{{
 		m.KeyMap.Up,
 		m.KeyMap.Down,
-		m.KeyMap.Yank,
-		m.KeyMap.Describe,
+		m.KeyMap.Copy,
+		m.KeyMap.Show,
 	}}
 
 	return append(kb,

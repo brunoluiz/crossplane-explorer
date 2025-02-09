@@ -11,8 +11,8 @@ type KeyMap struct {
 	Up          key.Binding
 	Quit        key.Binding
 
-	Yank          key.Binding
-	Describe      key.Binding
+	Copy          key.Binding
+	Show          key.Binding
 	ShowFullHelp  key.Binding
 	CloseFullHelp key.Binding
 }
@@ -45,13 +45,13 @@ func DefaultKeyMap() KeyMap {
 			key.WithHelp("↑/k", "up"),
 		),
 
-		Yank: key.NewBinding(
-			key.WithKeys("y"),
-			key.WithHelp("y", "yank"),
+		Copy: key.NewBinding(
+			key.WithKeys("c"),
+			key.WithHelp("c", "copy"),
 		),
-		Describe: key.NewBinding(
-			key.WithKeys("enter", "d"),
-			key.WithHelp("enter/d", "describe"),
+		Show: key.NewBinding(
+			key.WithKeys("enter", "y"),
+			key.WithHelp("enter/y", "show"),
 		),
 		ShowFullHelp: key.NewBinding(
 			key.WithKeys("?"),

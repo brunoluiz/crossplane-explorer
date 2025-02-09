@@ -17,9 +17,9 @@ an interactive tracing explorer based on the tracer output.
 ### Trace
 
 - ✨ Expanded details at a glance, with highlight colouring for possible issues
-- 📖 Describe objects from the explorer, with no need to do it separately in kubectl
+- 📖 Show YAML objects from the explorer, with no need to do it separately in kubectl
 - 📖 Clean object YAMLs without `managedFields` (useful on apply, not as much on describe/get)
-- 📋 Yank full qualified objects names straight from UI (API group + Kind + name)
+- 📋 Copy full qualified objects names straight from UI (API group + Kind + name)
 - ♻️ Automatic refresh
 
 ### Upcoming

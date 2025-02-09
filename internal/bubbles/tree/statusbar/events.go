@@ -29,7 +29,7 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	//nolint // allow usage of switch
 	switch msg.String() {
 	case "y":
-		m.statusbar.FourthColumn = "yanked"
+		m.statusbar.FourthColumn = "copied"
 		m.statusbar.FourthColumnColors = m.secondaryColor
 	}
 	return nil
