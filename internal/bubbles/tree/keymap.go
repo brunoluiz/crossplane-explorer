@@ -51,8 +51,7 @@ func DefaultKeyMap() KeyMap {
 		),
 		Show: key.NewBinding(
 			key.WithKeys("enter", "y"),
-			key.WithHelp("enter/y", "show"),
-		),
+			key.WithHelp("enter/y", "show yaml")),
 		ShowFullHelp: key.NewBinding(
 			key.WithKeys("?"),
 			key.WithHelp("?", "help"),

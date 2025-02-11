@@ -76,10 +76,10 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	switch msg.String() {
 	case "ctrl+c", "ctlr+d":
 		return tea.Interrupt
-	case "y":
+	case "c":
 		//nolint // ignore errors
 		clipboard.WriteAll(m.tree.Current().Key)
-	case "enter", "d":
+	case "enter", "y":
 		curr := m.tree.Current().Value
 		trace, ok := curr.(*xplane.Resource)
 		if !ok {
