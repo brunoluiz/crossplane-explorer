@@ -15,6 +15,7 @@ type KeyMap struct {
 	Show          key.Binding
 	ShowFullHelp  key.Binding
 	CloseFullHelp key.Binding
+	Search        key.Binding
 }
 
 // DefaultKeyMap returns a default set of keybindings.
@@ -52,6 +53,9 @@ func DefaultKeyMap() KeyMap {
 		Show: key.NewBinding(
 			key.WithKeys("enter", "y"),
 			key.WithHelp("enter/y", "show yaml")),
+		Search: key.NewBinding(
+			key.WithKeys("/"),
+			key.WithHelp("/", "search")),
 		ShowFullHelp: key.NewBinding(
 			key.WithKeys("?"),
 			key.WithHelp("?", "help"),

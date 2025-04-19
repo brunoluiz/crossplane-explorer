@@ -1,6 +1,8 @@
 package tree
 
 import (
+	"fmt"
+
 	"github.com/atotto/clipboard"
 	"github.com/charmbracelet/bubbles/key"
 
@@ -13,6 +15,9 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		cmd = m.onResize(msg)
 	case tea.KeyMsg:
+		if m.searchMode {
+			return m.handleSearchKey(msg)
+		}
 		cmd = m.onKey(msg)
 	}
 
@@ -72,6 +77,30 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 		clipboard.WriteAll(m.Current().Key)
 	case key.Matches(msg, m.KeyMap.Quit):
 		return tea.Interrupt
+	case key.Matches(msg, m.KeyMap.Search):
+		m.searchMode = true
+		m.searchQuery = ""
+		m.statusbar.SetPath([]string{"Search: type to filter"})
 	}
 	return nil
+}
+
+func (m *Model) handleSearchKey(msg tea.KeyMsg) (Model, tea.Cmd) {
+	switch msg.String() {
+	case "enter":
+		m.searchMode = false
+		m.applySearchFilter()
+		m.statusbar.SetPath([]string{fmt.Sprintf("Showing filtered results for '%s'", m.searchQuery)})
+	case "esc":
+		m.searchMode = false
+		m.searchQuery = ""
+		m.filteredNodes = m.nodes
+		m.statusbar.SetPath([]string{"Search cleared"})
+	default:
+		// TODO: this probably needs to deal with backspace and other keys
+		m.searchQuery += msg.String()
+		m.applySearchFilter()
+		m.statusbar.SetPath([]string{fmt.Sprintf("Search: %s", m.searchQuery)})
+	}
+	return *m, nil
 }

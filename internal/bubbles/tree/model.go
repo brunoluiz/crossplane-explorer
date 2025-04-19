@@ -54,6 +54,10 @@ type Model struct {
 	cursor        int
 
 	showHelp bool
+
+	searchMode    bool
+	searchQuery   string
+	filteredNodes []Node
 }
 
 func New(
@@ -103,6 +107,9 @@ func (m Model) View() string {
 
 func (m *Model) SetNodes(nodes []Node) {
 	m.nodes = nodes
+	if m.filteredNodes == nil {
+		m.filteredNodes = nodes
+	}
 
 	count := 0 // This is used to keep track of the index of the node we are on (important because we are using a recursive function)
 	rows := []table.Row{}
@@ -158,6 +165,10 @@ func (m Model) FullHelp() [][]key.Binding {
 		})
 }
 
+func (m *Model) IsSearchMode() bool {
+	return m.searchMode
+}
+
 func (m Model) Current() Node              { return *m.nodesByCursor[m.cursor] }
 func (m *Model) SetShowHelp() bool         { return m.showHelp }
 func (m *Model) setSize(width, height int) { m.width = width; m.height = height }
@@ -180,10 +191,43 @@ func (m *Model) numberOfNodes() int {
 	return count
 }
 
+func (m *Model) applySearchFilter() {
+	if m.searchQuery == "" {
+		m.filteredNodes = m.nodes
+		return
+	}
+
+	var filter func([]Node) []Node
+	filter = func(nodes []Node) []Node {
+		var result []Node
+		for _, node := range nodes {
+			if strings.Contains(strings.ToLower(node.Key), strings.ToLower(m.searchQuery)) {
+				result = append(result, node)
+			}
+			if len(node.Children) > 0 {
+				filteredChildren := filter(node.Children)
+				if len(filteredChildren) > 0 {
+					node.Children = filteredChildren
+					result = append(result, node)
+				}
+			}
+		}
+		return result
+	}
+
+	m.filteredNodes = filter(m.nodes)
+}
+
 func (m *Model) renderTree(rows *[]table.Row, remainingNodes []Node, currentPath []string, indent int, count *int) {
+	// Use filteredNodes instead of nodes when in search mode
+	nodesToRender := remainingNodes
+	if m.searchQuery != "" {
+		nodesToRender = m.filteredNodes
+	}
+
 	const treeNodePrefix string = " └─"
 
-	for _, node := range remainingNodes {
+	for _, node := range nodesToRender {
 		// If we aren't at the root, we add the arrow shape to the string
 		shape := ""
 		if indent > 0 {

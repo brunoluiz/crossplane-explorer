@@ -76,6 +76,10 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	case "ctrl+c", "ctrl+d":
 		return tea.Interrupt
 	case "enter", "y":
+		if m.pane != PaneTree || m.tree.IsSearchMode() {
+			return nil
+		}
+
 		curr := m.tree.Current().Value
 		trace, ok := curr.(*xplane.Resource)
 		if !ok {
