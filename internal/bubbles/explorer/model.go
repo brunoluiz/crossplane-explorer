@@ -211,12 +211,12 @@ func (m *Model) setColumns(gk schema.GroupKind) {
 }
 
 func (m *Model) setNodes(data *xplane.Resource) {
-	nodes := []tree.Node{
-		{Label: "root", Children: make([]tree.Node, 1)},
+	nodes := []*tree.Node{
+		{Label: "root", Children: make([]*tree.Node, 1)},
 	}
 	resByNode := map[*tree.Node]*xplane.Resource{}
 	kind := data.Unstructured.GroupVersionKind().GroupKind()
-	addNodes(kind, data, &nodes[0])
+	addNodes(kind, data, nodes[0])
 	m.tree.SetNodes(nodes)
 	m.resByNode = resByNode
 }

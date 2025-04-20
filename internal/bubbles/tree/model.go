@@ -35,7 +35,7 @@ type Node struct {
 	Selected ColorConfig
 	Color    lipgloss.TerminalColor
 
-	Children []Node
+	Children []*Node
 }
 
 type Model struct {
@@ -48,7 +48,7 @@ type Model struct {
 
 	width         int
 	height        int
-	nodes         []Node
+	nodes         []*Node
 	nodesByCursor map[int]*Node
 	pathByNode    map[*Node][]string
 	cursor        int
@@ -57,7 +57,7 @@ type Model struct {
 
 	searchMode      bool
 	searchQuery     string
-	filteredNodes   []Node
+	filteredNodes   []*Node
 	searchResults   []*Node
 	searchResultIdx int
 }
@@ -110,7 +110,7 @@ func (m Model) View() string {
 	)
 }
 
-func (m *Model) SetNodes(nodes []Node) {
+func (m *Model) SetNodes(nodes []*Node) {
 	m.nodes = nodes
 
 	count := 0 // This is used to keep track of the index of the node we are on (important because we are using a recursive function)
@@ -178,8 +178,8 @@ func (m *Model) setSize(width, height int) { m.width = width; m.height = height 
 func (m *Model) numberOfNodes() int {
 	count := 0
 
-	var countNodes func([]Node)
-	countNodes = func(nodes []Node) {
+	var countNodes func([]*Node)
+	countNodes = func(nodes []*Node) {
 		for _, node := range nodes {
 			count++
 			if node.Children != nil {
@@ -202,22 +202,21 @@ func (m *Model) applySearchFilter() {
 		return
 	}
 
-	var search func([]Node)
-	search = func(nodes []Node) {
-		for k := 0; k < len(nodes); k++ {
-			n := &nodes[k]
+	var search func(*[]*Node)
+	search = func(nodes *[]*Node) {
+		for _, n := range *nodes {
 			if strings.Contains(strings.ToLower(n.Key), strings.ToLower(m.searchQuery)) {
 				m.searchResults = append(m.searchResults, n)
 			}
 			if len(n.Children) > 0 {
-				search(n.Children)
+				search(&n.Children)
 			}
 		}
 	}
-	search(m.nodes)
+	search(&m.nodes)
 	p := []*Node{}
 	for _, v := range m.nodes {
-		p = append(p, &v)
+		p = append(p, v)
 	}
 	m.logger.Info("test", "searchResults", m.searchResults, "nodes", p)
 }
@@ -256,7 +255,7 @@ func (m *Model) prevSearchResult() {
 	m.highlightSearchResult()
 }
 
-func (m *Model) renderTree(rows *[]table.Row, remainingNodes []Node, currentPath []string, indent int, count *int) {
+func (m *Model) renderTree(rows *[]table.Row, remainingNodes []*Node, currentPath []string, indent int, count *int) {
 	nodesToRender := remainingNodes
 
 	const treeNodePrefix string = " └─"
@@ -287,13 +286,13 @@ func (m *Model) renderTree(rows *[]table.Row, remainingNodes []Node, currentPath
 		}
 
 		*rows = append(*rows, cols)
-		m.nodesByCursor[idx] = &node
+		m.nodesByCursor[idx] = node
 
 		// Used to be able to trace back the path on the tree
 		path := make([]string, len(currentPath))
 		copy(path, currentPath)
 		path = append(path, node.Label)
-		m.pathByNode[&node] = path
+		m.pathByNode[node] = path
 
 		if node.Children != nil {
 			m.renderTree(rows, node.Children, path, indent+1, count)

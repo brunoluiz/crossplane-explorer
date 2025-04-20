@@ -108,7 +108,7 @@ func addNodes(kind schema.GroupKind, v *xplane.Resource, n *tree.Node) {
 
 	n.Label = name
 	n.Key = fmt.Sprintf("%s.%s/%s", v.Unstructured.GetKind(), group, v.Unstructured.GetName())
-	n.Children = make([]tree.Node, len(v.Children))
+	n.Children = make([]*tree.Node, len(v.Children))
 
 	if v.Unstructured.GetAnnotations()["crossplane.io/paused"] == "true" {
 		n.Label += " (paused)"
@@ -146,8 +146,8 @@ func addNodes(kind schema.GroupKind, v *xplane.Resource, n *tree.Node) {
 	n.Value = v
 
 	for k, cv := range v.Children {
-		n.Children[k] = tree.Node{}
-		addNodes(kind, cv, &n.Children[k])
+		n.Children[k] = &tree.Node{}
+		addNodes(kind, cv, n.Children[k])
 	}
 }
 
