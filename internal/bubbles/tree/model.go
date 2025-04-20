@@ -55,9 +55,11 @@ type Model struct {
 
 	showHelp bool
 
-	searchMode    bool
-	searchQuery   string
-	filteredNodes []Node
+	searchMode      bool
+	searchQuery     string
+	filteredNodes   []Node
+	searchResults   []*Node
+	searchResultIdx int
 }
 
 func New(
@@ -97,6 +99,9 @@ func (m Model) View() string {
 
 	availableHeight -= m.statusbar.GetHeight()
 	m.table.SetHeight(availableHeight)
+	if len(m.nodes) > 0 {
+		m.SetNodes(m.nodes)
+	}
 
 	return lipgloss.JoinVertical(lipgloss.Left,
 		lipgloss.NewStyle().Height(m.height-m.statusbar.GetHeight()).Render(m.table.View()),
@@ -107,9 +112,6 @@ func (m Model) View() string {
 
 func (m *Model) SetNodes(nodes []Node) {
 	m.nodes = nodes
-	if m.filteredNodes == nil {
-		m.filteredNodes = nodes
-	}
 
 	count := 0 // This is used to keep track of the index of the node we are on (important because we are using a recursive function)
 	rows := []table.Row{}
@@ -192,38 +194,70 @@ func (m *Model) numberOfNodes() int {
 }
 
 func (m *Model) applySearchFilter() {
+	m.searchResults = []*Node{}
+	m.searchResultIdx = 0
+
 	if m.searchQuery == "" {
-		m.filteredNodes = m.nodes
+		m.searchResults = []*Node{}
 		return
 	}
 
-	var filter func([]Node) []Node
-	filter = func(nodes []Node) []Node {
-		var result []Node
-		for _, node := range nodes {
-			if strings.Contains(strings.ToLower(node.Key), strings.ToLower(m.searchQuery)) {
-				result = append(result, node)
+	var search func([]Node)
+	search = func(nodes []Node) {
+		for k := 0; k < len(nodes); k++ {
+			n := &nodes[k]
+			if strings.Contains(strings.ToLower(n.Key), strings.ToLower(m.searchQuery)) {
+				m.searchResults = append(m.searchResults, n)
 			}
-			if len(node.Children) > 0 {
-				filteredChildren := filter(node.Children)
-				if len(filteredChildren) > 0 {
-					node.Children = filteredChildren
-					result = append(result, node)
-				}
+			if len(n.Children) > 0 {
+				search(n.Children)
 			}
 		}
-		return result
 	}
+	search(m.nodes)
+	p := []*Node{}
+	for _, v := range m.nodes {
+		p = append(p, &v)
+	}
+	m.logger.Info("test", "searchResults", m.searchResults, "nodes", p)
+}
 
-	m.filteredNodes = filter(m.nodes)
+func (m *Model) highlightSearchResult() {
+	if len(m.searchResults) == 0 {
+		return
+	}
+	m.cursor = m.getNodeIndex(m.searchResults[m.searchResultIdx])
+	m.logger.Info("test", "cursor", m.cursor, "idx", m.searchResultIdx)
+}
+
+func (m *Model) getNodeIndex(node *Node) int {
+	for idx, n := range m.nodesByCursor {
+		if n == node {
+			return idx
+		}
+	}
+	return 0
+}
+
+func (m *Model) nextSearchResult() {
+	m.logger.Info("test", "nodes", len(m.searchResults))
+	if len(m.searchResults) == 0 {
+		return
+	}
+	m.searchResultIdx = (m.searchResultIdx + 1) % len(m.searchResults)
+	m.highlightSearchResult()
+}
+
+func (m *Model) prevSearchResult() {
+	if len(m.searchResults) == 0 {
+		return
+	}
+	m.searchResultIdx = (m.searchResultIdx - 1 + len(m.searchResults)) % len(m.searchResults)
+	m.highlightSearchResult()
 }
 
 func (m *Model) renderTree(rows *[]table.Row, remainingNodes []Node, currentPath []string, indent int, count *int) {
-	// Use filteredNodes instead of nodes when in search mode
 	nodesToRender := remainingNodes
-	if m.searchQuery != "" {
-		nodesToRender = m.filteredNodes
-	}
 
 	const treeNodePrefix string = " └─"
 
@@ -241,6 +275,10 @@ func (m *Model) renderTree(rows *[]table.Row, remainingNodes []Node, currentPath
 		s := lipgloss.NewStyle()
 		if m.cursor != idx {
 			s = s.Foreground(node.Color)
+		}
+
+		if m.searchQuery != "" && strings.Contains(strings.ToLower(node.Key), strings.ToLower(m.searchQuery)) {
+			s = s.Bold(true).Foreground(lipgloss.Color("#0000ff"))
 		}
 
 		cols := []table.Cell{{Value: shape + node.Label, Style: s}}

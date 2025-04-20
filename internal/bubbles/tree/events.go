@@ -81,6 +81,10 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 		m.searchMode = true
 		m.searchQuery = ""
 		m.statusbar.SetPath([]string{"Search: type to filter"})
+	case msg.String() == "n":
+		m.nextSearchResult()
+	case msg.String() == "N":
+		m.prevSearchResult()
 	}
 	return nil
 }
