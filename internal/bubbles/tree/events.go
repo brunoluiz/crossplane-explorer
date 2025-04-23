@@ -1,6 +1,7 @@
 package tree
 
 import (
+	"github.com/atotto/clipboard"
 	"github.com/charmbracelet/bubbles/key"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -66,6 +67,11 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 		fallthrough
 	case key.Matches(msg, m.KeyMap.CloseFullHelp):
 		m.Help.ShowAll = !m.Help.ShowAll
+	case key.Matches(msg, m.KeyMap.Copy):
+		//nolint // ignore errors
+		clipboard.WriteAll(m.Current().Key)
+	case key.Matches(msg, m.KeyMap.Quit):
+		return tea.Interrupt
 	}
 	return nil
 }

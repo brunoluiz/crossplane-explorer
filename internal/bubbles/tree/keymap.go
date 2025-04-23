@@ -62,7 +62,7 @@ func DefaultKeyMap() KeyMap {
 		),
 
 		Quit: key.NewBinding(
-			key.WithKeys("q", "esc"),
+			key.WithKeys("q"),
 			key.WithHelp("q", "quit"),
 		),
 	}

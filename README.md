@@ -57,7 +57,7 @@ crossplane-explorer trace -n namespace Object/hello-world
 ## 🧾 To-do
 
 - Add search on the viewer
-- Add kubectl describe on `Enter`` or `d` press
+- Add kubectl describe on `Enter` or `d` press
 - Fix colouring flipping when highlighted
 - Refactor bubbles package to be more domain driven or fit the hexagonal architecture
 - Open issue around issues on colour rendering on tables bubbles (reason why I had to fork)

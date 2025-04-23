@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/atotto/clipboard"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/explorer/viewer"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/tree"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
@@ -74,11 +73,8 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	switch msg.String() {
-	case "ctrl+c", "ctlr+d":
+	case "ctrl+c", "ctrl+d":
 		return tea.Interrupt
-	case "c":
-		//nolint // ignore errors
-		clipboard.WriteAll(m.tree.Current().Key)
 	case "enter", "y":
 		curr := m.tree.Current().Value
 		trace, ok := curr.(*xplane.Resource)
@@ -93,10 +89,8 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 		}
 
 		m.pane = PaneSummary
-	case "q", "esc":
-		if m.pane == PaneTree {
-			return tea.Interrupt
-		} else {
+	case "esc":
+		if m.pane != PaneTree {
 			m.pane = PaneTree
 		}
 	}

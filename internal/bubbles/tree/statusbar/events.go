@@ -28,7 +28,7 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	//nolint // allow usage of switch
 	switch msg.String() {
-	case "y":
+	case "c":
 		m.statusbar.FourthColumn = "copied"
 		m.statusbar.FourthColumnColors = m.secondaryColor
 	}
