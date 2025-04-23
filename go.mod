@@ -1,6 +1,6 @@
 module github.com/brunoluiz/crossplane-explorer
 
-go 1.23.4
+go 1.24.2
 
 require (
 	github.com/atotto/clipboard v0.1.4

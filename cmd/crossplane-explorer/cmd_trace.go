@@ -28,7 +28,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 		Name:    "trace",
 		Aliases: []string{"t"},
 		Flags: []cli.Flag{
-			&cli.StringFlag{Name: "log", Aliases: []string{"l"}, Usage: "Log destination", Value: "crossplane-explorer.trace.log"},
+			&cli.StringFlag{Name: "log", Aliases: []string{"l"}, Usage: "Log destination (eg: /tmp/logs.txt", Value: ""},
 			&cli.StringFlag{Name: "cmd", Usage: "Which binary should it use to generate the JSON trace", Value: "crossplane beta trace -o json"},
 			&cli.StringFlag{Name: "context", Aliases: []string{"ctx"}, Usage: "Kubernetes context to be used"},
 			&cli.StringFlag{Name: "namespace", Aliases: []string{"n", "ns"}, Usage: "Kubernetes namespace to be used"},
@@ -38,12 +38,15 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 			&cli.DurationFlag{Name: "watch-interval", Aliases: []string{"wi"}, Usage: "Refresh interval for the watcher feature", Value: 5 * time.Second},
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
-			f, err := os.Create(c.String("log"))
-			if err != nil {
-				return err
-			}
+			logger := slog.New(slog.DiscardHandler)
+			if c.String("log") != "" {
+				f, err := os.Create(c.String("log"))
+				if err != nil {
+					return err
+				}
 
-			logger := slog.New(slog.NewTextHandler(f, &slog.HandlerOptions{}))
+				logger = slog.New(slog.NewTextHandler(f, &slog.HandlerOptions{}))
+			}
 
 			app := tea.NewProgram(
 				explorer.New(
@@ -72,7 +75,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				tea.WithContext(ctx),
 			)
 
-			_, err = app.Run()
+			_, err := app.Run()
 			return err
 		},
 	}
