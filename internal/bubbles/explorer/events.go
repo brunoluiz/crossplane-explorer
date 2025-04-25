@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/explorer/viewer"
+	xviewer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/explorer/viewer"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/tree"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/viewer"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
@@ -25,6 +27,22 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.onResize(msg)
 	case tea.KeyMsg:
 		cmd = m.onKey(msg)
+	case viewer.EventQuit:
+		m.pane = PaneTree
+		return m, nil
+	case tree.EventQuit:
+		return m, tea.Interrupt
+	case tree.EventShow:
+		trace, ok := msg.Node.Value.(*xplane.Resource)
+		if !ok {
+			return m, nil
+		}
+
+		if err := m.viewer.SetContent(xviewer.ContentInput{Trace: trace}); err != nil {
+			m.setIrrecoverableError(err)
+			return m, nil
+		}
+		m.pane = PaneSummary
 	}
 
 	switch m.pane {
@@ -72,27 +90,9 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 }
 
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
-	switch msg.String() {
-	case "ctrl+c", "ctrl+d":
+	switch {
+	case key.Matches(msg, m.keyMap.Quit):
 		return tea.Interrupt
-	case "enter", "y":
-		curr := m.tree.Current().Value
-		trace, ok := curr.(*xplane.Resource)
-		if !ok {
-			return nil
-		}
-
-		err := m.viewer.SetContent(viewer.ContentInput{Trace: trace})
-		if err != nil {
-			m.setIrrecoverableError(err)
-			return nil
-		}
-
-		m.pane = PaneSummary
-	case "esc":
-		if m.pane != PaneTree {
-			m.pane = PaneTree
-		}
 	}
 
 	return nil

@@ -9,12 +9,14 @@ import (
 )
 
 type Model struct {
+	KeyMap KeyMap
+
 	title     string
 	sideTitle string
 	content   string
 
 	cmdQuit tea.Cmd
-	styles  Styles
+	Styles  Styles
 
 	// You generally won't need this unless you're processing stuff with
 	// complicated ANSI escape sequences. Turn it on if you notice flickering.
@@ -44,9 +46,10 @@ func WithHighPerformanceRenderer(enabled bool) func(m *Model) {
 
 func New(opts ...WithOpt) Model {
 	m := Model{
-		cmdQuit:                    nil,
+		KeyMap:                     DefaultKeyMap(),
+		Styles:                     DefaultStyles(),
+		cmdQuit:                    func() tea.Msg { return EventQuit{} },
 		useHighPerformanceRenderer: false,
-		styles:                     DefaultStyles(),
 	}
 
 	for _, opt := range opts {
@@ -60,8 +63,8 @@ func (m Model) Init() tea.Cmd { return nil }
 
 func (m Model) GetWidth() int {
 	w := m.viewport.Width
-	borderLeftW := m.styles.Viewport.GetBorderLeftSize()
-	borderRightW := m.styles.Viewport.GetBorderRightSize()
+	borderLeftW := m.Styles.Viewport.GetBorderLeftSize()
+	borderRightW := m.Styles.Viewport.GetBorderRightSize()
 	return w - borderLeftW - borderRightW
 }
 
@@ -89,14 +92,14 @@ func (m *Model) SetContent(msg ContentInput) {
 func (m Model) headerView() string {
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
-		m.styles.Title.Render(m.title),
-		m.styles.SideTitle.Render(m.sideTitle),
+		m.Styles.Title.Render(m.title),
+		m.Styles.SideTitle.Render(m.sideTitle),
 	)
 }
 
 func (m Model) footerView() string {
 	return lipgloss.JoinHorizontal(
 		lipgloss.Right,
-		m.styles.Footer.Render(fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100)),
+		m.Styles.Footer.Render(fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100)),
 	)
 }

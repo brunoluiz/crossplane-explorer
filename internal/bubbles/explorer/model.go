@@ -46,6 +46,7 @@ type Tracer interface {
 }
 
 type Model struct {
+	keyMap        KeyMap
 	tree          tree.Model
 	viewer        viewer.Model
 	tracer        Tracer
@@ -89,6 +90,7 @@ func New(
 	opts ...WithOpt,
 ) *Model {
 	m := &Model{
+		keyMap:        DefaultKeyMap(),
 		logger:        logger,
 		tree:          treeModel,
 		viewer:        viewerModel,

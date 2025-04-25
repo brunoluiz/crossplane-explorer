@@ -7,6 +7,12 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type EventShow struct {
+	Node Node
+}
+
+type EventQuit struct{}
+
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
@@ -70,8 +76,14 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	case key.Matches(msg, m.KeyMap.Copy):
 		//nolint // ignore errors
 		clipboard.WriteAll(m.Current().Key)
+	case key.Matches(msg, m.KeyMap.Show):
+		return func() tea.Msg {
+			return EventShow{Node: m.Current()}
+		}
 	case key.Matches(msg, m.KeyMap.Quit):
-		return tea.Interrupt
+		return func() tea.Msg {
+			return EventQuit{}
+		}
 	}
 	return nil
 }

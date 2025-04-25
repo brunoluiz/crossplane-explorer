@@ -1,11 +1,14 @@
 package viewer
 
 import (
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/samber/lo"
 )
+
+type EventQuit struct{}
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var (
@@ -28,7 +31,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 }
 
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
-	if k := msg.String(); k == "ctrl+c" || k == "q" || k == "esc" {
+	switch {
+	case key.Matches(msg, m.KeyMap.Quit):
 		return m.cmdQuit
 	}
 	return nil
@@ -46,11 +50,11 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 		// quickly, though asynchronously, which is why we wait for them
 		// here.
 		m.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
-		m.viewport.Style = m.styles.Viewport
+		m.viewport.Style = m.Styles.Viewport
 		m.viewport.YPosition = headerHeight
 		m.viewport.HighPerformanceRendering = m.useHighPerformanceRenderer
-		m.viewport.KeyMap.PageUp.SetKeys(lo.Flatten([][]string{{"ctrl+b"}, m.viewport.KeyMap.PageUp.Keys()})...)
-		m.viewport.KeyMap.PageDown.SetKeys(lo.Flatten([][]string{{"ctrl+f"}, m.viewport.KeyMap.PageDown.Keys()})...)
+		m.viewport.KeyMap.PageUp.SetKeys(lo.Flatten([][]string{m.KeyMap.PageUp.Keys(), m.viewport.KeyMap.PageUp.Keys()})...)
+		m.viewport.KeyMap.PageDown.SetKeys(lo.Flatten([][]string{m.KeyMap.PageDown.Keys(), m.viewport.KeyMap.PageDown.Keys()})...)
 		m.viewport.SetContent(m.content)
 		m.ready = true
 
