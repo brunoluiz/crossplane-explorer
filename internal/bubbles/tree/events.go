@@ -22,6 +22,15 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		cmd = m.onKey(msg)
 	}
 
+	switch m.searchMode {
+	case searchModeInput:
+		var searchCmd tea.Cmd
+		m.searchInput, searchCmd = m.searchInput.Update(msg)
+		return m, searchCmd
+	case searchModeInit:
+		m.searchMode = searchModeInput
+	}
+
 	var tableCmd tea.Cmd
 	m.table, tableCmd = m.table.Update(msg)
 
@@ -63,19 +72,56 @@ func (m *Model) onSelectionChange(node *Node) {
 	m.statusbar.SetPath(m.pathByNode[node])
 }
 
-func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
+func (m *Model) onSearch(msg tea.KeyMsg) tea.Cmd {
 	switch {
+	case key.Matches(msg, m.KeyMap.SearchConfirm):
+		m.searchResult = m.searchInput.Value()
+		m.searchInput.Blur()
+		m.searchMode = searchModeFilter
+	case key.Matches(msg, m.KeyMap.SearchQuit):
+		m.searchInput.Blur()
+		m.searchMode = searchModeOff
+		m.searchResult = ""
+		m.searchInput.Reset()
+	}
+	return nil
+}
+
+func (m *Model) onSearchInit() {
+	m.searchMode = searchModeInit
+	m.searchInput.Focus()
+}
+
+func (m *Model) onSearchQuit() {
+	if m.searchMode == searchModeOff {
+		return
+	}
+	m.searchInput.Blur()
+	m.searchMode = searchModeOff
+	m.searchResult = ""
+	m.searchInput.Reset()
+}
+
+func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
+	if m.searchMode == searchModeInput {
+		return m.onSearch(msg)
+	}
+
+	switch {
+	case key.Matches(msg, m.KeyMap.Search):
+		m.onSearchInit()
 	case key.Matches(msg, m.KeyMap.Up):
 		m.onNavUp()
 	case key.Matches(msg, m.KeyMap.Down):
 		m.onNavDown()
-	case key.Matches(msg, m.KeyMap.ShowFullHelp):
-		fallthrough
-	case key.Matches(msg, m.KeyMap.CloseFullHelp):
-		m.Help.ShowAll = !m.Help.ShowAll
+	case key.Matches(msg, m.KeyMap.Help):
+		m.showHelp = !m.showHelp
+		// m.Help.ShowAll = !m.Help.ShowAll
 	case key.Matches(msg, m.KeyMap.Copy):
 		//nolint // ignore errors
 		clipboard.WriteAll(m.Current().Key)
+	case key.Matches(msg, m.KeyMap.SearchQuit):
+		m.onSearchQuit()
 	case key.Matches(msg, m.KeyMap.Show):
 		return func() tea.Msg {
 			return EventShow{Node: m.Current()}

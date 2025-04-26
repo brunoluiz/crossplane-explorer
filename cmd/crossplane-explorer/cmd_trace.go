@@ -12,6 +12,7 @@ import (
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/tree"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/tree/statusbar"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
@@ -63,6 +64,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 								return s
 							}()),
 						),
+						textinput.New(),
 						statusbar.New(),
 					),
 					viewer.New(),

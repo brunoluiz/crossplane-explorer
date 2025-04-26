@@ -11,9 +11,13 @@ type KeyMap struct {
 	Up          key.Binding
 	Quit        key.Binding
 
+	Search        key.Binding
+	SearchConfirm key.Binding
+	SearchQuit    key.Binding
+
 	Copy          key.Binding
 	Show          key.Binding
-	ShowFullHelp  key.Binding
+	Help          key.Binding
 	CloseFullHelp key.Binding
 }
 
@@ -45,6 +49,19 @@ func DefaultKeyMap() KeyMap {
 			key.WithHelp("↑/k", "up"),
 		),
 
+		Search: key.NewBinding(
+			key.WithKeys("/"),
+			key.WithHelp("/", "search"),
+		),
+		SearchConfirm: key.NewBinding(
+			key.WithKeys("enter"),
+			key.WithHelp("enter", "search confirm"),
+		),
+		SearchQuit: key.NewBinding(
+			key.WithKeys("esc"),
+			key.WithHelp("esc", "search quit"),
+		),
+
 		Copy: key.NewBinding(
 			key.WithKeys("c"),
 			key.WithHelp("c", "copy"),
@@ -52,13 +69,9 @@ func DefaultKeyMap() KeyMap {
 		Show: key.NewBinding(
 			key.WithKeys("enter", "y"),
 			key.WithHelp("enter/y", "show yaml")),
-		ShowFullHelp: key.NewBinding(
-			key.WithKeys("?"),
-			key.WithHelp("?", "help"),
-		),
-		CloseFullHelp: key.NewBinding(
-			key.WithKeys("?"),
-			key.WithHelp("?", "close help"),
+		Help: key.NewBinding(
+			key.WithKeys("?", "h"),
+			key.WithHelp("?/h", "toogle help"),
 		),
 
 		Quit: key.NewBinding(

@@ -1,6 +1,7 @@
 package tree
 
 import (
+	"fmt"
 	"log/slog"
 	"strings"
 	"time"
@@ -10,9 +11,19 @@ import (
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/textinput"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+)
+
+type searchMode int
+
+const (
+	searchModeOff searchMode = iota
+	searchModeInit
+	searchModeInput
+	searchModeFilter
 )
 
 type State struct {
@@ -39,12 +50,13 @@ type Node struct {
 }
 
 type Model struct {
-	KeyMap    KeyMap
-	Styles    Styles
-	Help      help.Model
-	table     table.Model
-	statusbar statusbar.Model
-	logger    *slog.Logger
+	KeyMap      KeyMap
+	Styles      Styles
+	Help        help.Model
+	table       table.Model
+	searchInput textinput.Model
+	statusbar   statusbar.Model
+	logger      *slog.Logger
 
 	width         int
 	height        int
@@ -53,27 +65,33 @@ type Model struct {
 	pathByNode    map[*Node][]string
 	cursor        int
 
-	showHelp bool
+	showHelp     bool
+	searchMode   searchMode
+	searchResult string
 }
 
 func New(
-	l *slog.Logger,
-	t table.Model,
-	s statusbar.Model,
+	logger *slog.Logger,
+	tableModel table.Model,
+	searchInputModel textinput.Model,
+	statusBarModel statusbar.Model,
 ) Model {
+	searchInputModel.Prompt = "🔍 "
+	searchInputModel.Placeholder = "Search..."
 	return Model{
-		logger:    l,
-		table:     t,
-		statusbar: s,
-		KeyMap:    DefaultKeyMap(),
-		Styles:    DefaultStyles(),
+		logger:      logger,
+		table:       tableModel,
+		searchInput: searchInputModel,
+		statusbar:   statusBarModel,
+		KeyMap:      DefaultKeyMap(),
+		Styles:      DefaultStyles(),
 
 		width:         0,
 		height:        0,
 		nodesByCursor: map[int]*Node{},
 		pathByNode:    map[*Node][]string{},
 
-		showHelp: true,
+		showHelp: false,
 		Help:     help.New(),
 	}
 }
@@ -83,37 +101,55 @@ func (m *Model) Init() tea.Cmd {
 }
 
 func (m Model) View() string {
+	components := []string{}
 	availableHeight := m.height
 
-	var help string
 	if m.showHelp {
-		help = m.helpView()
+		help := m.helpView()
 		availableHeight -= lipgloss.Height(help)
+		components = append(components, help)
 	}
 
-	availableHeight -= m.statusbar.GetHeight()
-	m.table.SetHeight(availableHeight)
+	switch m.searchMode {
+	case searchModeInit:
+		fallthrough
+	case searchModeInput:
+		searchBar := lipgloss.NewStyle().Render(m.searchInput.View())
+		availableHeight -= lipgloss.Height(searchBar)
+		components = append(components, searchBar)
+	case searchModeFilter:
+		filterBar := lipgloss.NewStyle().Render(fmt.Sprintf("🔍 Showing results for: %s", m.searchInput.Value()))
+		availableHeight -= lipgloss.Height(filterBar)
+		components = append(components, filterBar)
+	}
 
-	return lipgloss.JoinVertical(lipgloss.Left,
-		lipgloss.NewStyle().Height(m.height-m.statusbar.GetHeight()).Render(m.table.View()),
-		help,
-		m.statusbar.View(),
-	)
+	components = append(components, m.statusbar.View())
+
+	m.loadTable(m.nodes)
+	m.table.SetHeight(availableHeight)
+	tree := m.table.View()
+
+	return lipgloss.JoinVertical(lipgloss.Left, append([]string{tree}, components...)...)
 }
 
 func (m *Model) SetNodes(nodes []Node) {
 	m.nodes = nodes
 
-	count := 0 // This is used to keep track of the index of the node we are on (important because we are using a recursive function)
-	rows := []table.Row{}
-	m.renderTree(&rows, m.nodes, []string{}, 0, &count)
-	m.table.SetRows(rows)
+	m.loadTable(m.nodes)
 	m.table.Focus()
 
 	// Set the path to the first item, since it will only render further values on cursor change
 	if m.cursor == 0 {
 		m.statusbar.SetPath([]string{nodes[0].Label})
 	}
+}
+
+func (m *Model) loadTable(nodes []Node) []table.Row {
+	count := 0 // This is used to keep track of the index of the node we are on (important because we are using a recursive function)
+	rows := []table.Row{}
+	m.renderTree(&rows, nodes, []string{}, 0, &count)
+	m.table.SetRows(rows)
+	return rows
 }
 
 func (m *Model) SetColumns(cc []table.Column) {
@@ -136,6 +172,8 @@ func (m Model) ShortHelp() []key.Binding {
 		m.KeyMap.Down,
 		m.KeyMap.Copy,
 		m.KeyMap.Show,
+		m.KeyMap.Search,
+		m.KeyMap.Help,
 	}
 
 	return append(kb,
@@ -159,7 +197,6 @@ func (m Model) FullHelp() [][]key.Binding {
 }
 
 func (m Model) Current() Node              { return *m.nodesByCursor[m.cursor] }
-func (m *Model) SetShowHelp() bool         { return m.showHelp }
 func (m *Model) setSize(width, height int) { m.width = width; m.height = height }
 
 func (m *Model) numberOfNodes() int {
@@ -182,6 +219,7 @@ func (m *Model) numberOfNodes() int {
 
 func (m *Model) renderTree(rows *[]table.Row, remainingNodes []Node, currentPath []string, indent int, count *int) {
 	const treeNodePrefix string = " └─"
+	searchTerm := strings.ToLower(m.searchInput.Value())
 
 	for _, node := range remainingNodes {
 		// If we aren't at the root, we add the arrow shape to the string
@@ -197,6 +235,10 @@ func (m *Model) renderTree(rows *[]table.Row, remainingNodes []Node, currentPath
 		s := lipgloss.NewStyle()
 		if m.cursor != idx {
 			s = s.Foreground(node.Color)
+		}
+
+		if m.searchMode == searchModeFilter && strings.Contains(strings.ToLower(node.Key), searchTerm) {
+			s = s.Bold(true).Foreground(lipgloss.Color("15")).Background(lipgloss.Color("1")) // White on red
 		}
 
 		cols := []table.Cell{{Value: shape + node.Label, Style: s}}
@@ -220,5 +262,6 @@ func (m *Model) renderTree(rows *[]table.Row, remainingNodes []Node, currentPath
 }
 
 func (m Model) helpView() string {
+	m.Help.ShowAll = false
 	return m.Styles.Help.Render(m.Help.View(m))
 }
