@@ -59,9 +59,8 @@ type Model struct {
 	watchInterval time.Duration
 	logger        *slog.Logger
 
-	pane      Pane
-	err       error
-	resByNode map[*tree.Node]*xplane.Resource
+	pane Pane
+	err  error
 
 	kind schema.GroupKind
 }
@@ -104,8 +103,7 @@ func New(
 		watchInterval: 10 * time.Second,
 		short:         true,
 
-		pane:      PaneTree,
-		resByNode: map[*tree.Node]*xplane.Resource{},
+		pane: PaneTree,
 	}
 
 	for _, opt := range opts {
@@ -226,15 +224,14 @@ func (m *Model) setNodes(data *xplane.Resource) {
 	nodes := []tree.Node{
 		{Label: "root", Children: make([]tree.Node, 1)},
 	}
-	resByNode := map[*tree.Node]*xplane.Resource{}
 	m.kind = data.Unstructured.GroupVersionKind().GroupKind()
 	addNodes(m.kind, data, &nodes[0])
 
 	rows := []tree.TemporaryGlue{}
 	m.traceToRows(data, &rows, 0)
+	// m.tree.SetData(rows)
 
 	m.tree.SetNodes(nodes)
-	m.resByNode = resByNode
 }
 
 func (m *Model) setIrrecoverableError(err error) {

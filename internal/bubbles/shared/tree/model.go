@@ -75,6 +75,8 @@ type Model struct {
 	showHelp     bool
 	searchMode   searchMode
 	searchResult string
+
+	data []TemporaryGlue
 }
 
 func New(
@@ -137,6 +139,10 @@ func (m Model) View() string {
 	tree := m.table.View()
 
 	return lipgloss.JoinVertical(lipgloss.Left, append([]string{tree}, components...)...)
+}
+
+func (m *Model) SetData(data []TemporaryGlue) {
+	m.data = data
 }
 
 func (m *Model) SetNodes(nodes []Node) {
