@@ -15,3 +15,15 @@ The hack around it was to call the `cancel` when the `tea.Quit` happens and hand
 4. The correct way to use `bubbletea` seems to be by using events. So I tried to refactor and try to expose
 only read-only methods through the struct. Anything that would do a mutation should be an event and is handled
 within the `events.go` file (might be called `handlers.go` in the future).
+
+
+## New implementation for tree + search
+
+- `renderTree` is becoming quite complex... Probably it should render the required "row" format into an slice in the Update method
+  - Perhaps `tree` package should be responsible to convert tree into a slice of columns
+  - `explorer.addNode` seems to already do some recursive job and could be the method that translates it to rows
+- `tree` should be called `navigator`
+  - `statusbar` should be removed
+- Packages should be reorganised as `common`, `layout` and `app`
+
+- In the `xplane` package, we should have something to output it

@@ -3,7 +3,7 @@ package viewer
 import (
 	"fmt"
 
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/viewer"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/viewer"
 	"github.com/brunoluiz/crossplane-explorer/internal/ds"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	tea "github.com/charmbracelet/bubbletea"

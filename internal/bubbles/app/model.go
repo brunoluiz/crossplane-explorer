@@ -5,9 +5,9 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/explorer/viewer"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/table"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/tree"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/viewer"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/table"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/tree"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"

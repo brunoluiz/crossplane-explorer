@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	xviewer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/explorer/viewer"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/tree"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/viewer"
+	xviewer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/viewer"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/tree"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/viewer"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
