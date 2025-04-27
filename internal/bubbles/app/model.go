@@ -229,9 +229,9 @@ func (m *Model) setNodes(data *xplane.Resource) {
 
 	rows := []tree.TemporaryGlue{}
 	m.traceToRows(data, &rows, 0)
-	// m.tree.SetData(rows)
+	m.tree.SetData(rows)
 
-	m.tree.SetNodes(nodes)
+	// m.tree.SetNodes(nodes)
 }
 
 func (m *Model) setIrrecoverableError(err error) {

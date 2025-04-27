@@ -30,7 +30,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tree.EventQuit:
 		return m, tea.Interrupt
 	case tree.EventShow:
-		trace, ok := msg.Node.Value.(*xplane.Resource)
+		trace, ok := msg.Data.(*xplane.Resource)
 		if !ok {
 			return m, nil
 		}

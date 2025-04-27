@@ -8,7 +8,8 @@ import (
 )
 
 type EventShow struct {
-	Node Node
+	ID   string
+	Data any
 }
 
 type EventQuit struct{}
@@ -57,19 +58,19 @@ func (m *Model) onNavUp() {
 	if m.cursor < 0 {
 		m.cursor = 0
 	}
-	m.onSelectionChange(m.nodesByCursor[m.cursor])
+	// m.onSelectionChange(m.nodesByCursor[m.cursor])
 }
 
 func (m *Model) onNavDown() {
 	m.cursor++
-	if m.cursor >= m.numberOfNodes() {
-		m.cursor = m.numberOfNodes() - 1
+	if m.cursor >= len(m.data) {
+		m.cursor = len(m.data) - 1
 	}
-	m.onSelectionChange(m.nodesByCursor[m.cursor])
+	// m.onSelectionChange(m.nodesByCursor[m.cursor])
 }
 
 func (m *Model) onSelectionChange(node *Node) {
-	m.statusbar.SetPath(m.pathByNode[node])
+	// m.statusbar.SetPath(m.pathByNode[node])
 }
 
 func (m *Model) onSearch(msg tea.KeyMsg) tea.Cmd {
@@ -119,12 +120,13 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 		// m.Help.ShowAll = !m.Help.ShowAll
 	case key.Matches(msg, m.KeyMap.Copy):
 		//nolint // ignore errors
-		clipboard.WriteAll(m.Current().Key)
+		clipboard.WriteAll(m.Current().ID)
 	case key.Matches(msg, m.KeyMap.SearchQuit):
 		m.onSearchQuit()
 	case key.Matches(msg, m.KeyMap.Show):
 		return func() tea.Msg {
-			return EventShow{Node: m.Current()}
+			curr := m.Current()
+			return EventShow{ID: curr.ID, Data: curr.Data}
 		}
 	case key.Matches(msg, m.KeyMap.Quit):
 		return func() tea.Msg {
