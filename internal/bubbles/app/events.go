@@ -1,7 +1,6 @@
 package explorer
 
 import (
-	"fmt"
 	"time"
 
 	xviewer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/viewer"
@@ -11,8 +10,6 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/x/ansi"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -96,60 +93,4 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	}
 
 	return nil
-}
-
-func addNodes(kind schema.GroupKind, v *xplane.Resource, n *tree.Node) {
-	name := fmt.Sprintf("%s/%s", v.Unstructured.GetKind(), v.Unstructured.GetName())
-	group := v.Unstructured.GetObjectKind().GroupVersionKind().Group
-
-	n.Label = name
-	n.Key = fmt.Sprintf("%s.%s/%s", v.Unstructured.GetKind(), group, v.Unstructured.GetName())
-	n.Children = make([]tree.Node, len(v.Children))
-
-	if v.Unstructured.GetAnnotations()["crossplane.io/paused"] == "true" {
-		n.Label += " (paused)"
-		n.Color = lipgloss.ANSIColor(ansi.Yellow)
-	}
-
-	if xplane.IsPkg(kind) {
-		resStatus := xplane.GetPkgResourceStatus(v, name)
-		n.Details = map[string]string{
-			HeaderKeyVersion:       resStatus.Version,
-			HeaderKeyInstalled:     resStatus.Installed,
-			HeaderKeyInstalledLast: getTimeStr(resStatus.InstalledLastTransition),
-			HeaderKeyHealthy:       resStatus.Healthy,
-			HeaderKeyHealthyLast:   getTimeStr(resStatus.HealthyLastTransition),
-			HeaderKeyState:         resStatus.State,
-			HeaderKeyStatus:        resStatus.Status,
-		}
-		if !resStatus.Ok {
-			n.Color = lipgloss.ANSIColor(ansi.Red)
-		}
-	} else {
-		resStatus := xplane.GetResourceStatus(v, name)
-		n.Details = map[string]string{
-			HeaderKeyGroup:      group,
-			HeaderKeySynced:     resStatus.Synced,
-			HeaderKeySyncedLast: getTimeStr(resStatus.SyncedLastTransition),
-			HeaderKeyReady:      resStatus.Ready,
-			HeaderKeyReadyLast:  getTimeStr(resStatus.ReadyLastTransition),
-			HeaderKeyStatus:     resStatus.Status,
-		}
-		if !resStatus.Ok {
-			n.Color = lipgloss.ANSIColor(ansi.Red)
-		}
-	}
-	n.Value = v
-
-	for k, cv := range v.Children {
-		n.Children[k] = tree.Node{}
-		addNodes(kind, cv, &n.Children[k])
-	}
-}
-
-func getTimeStr(t time.Time) string {
-	if t.IsZero() {
-		return "-"
-	}
-	return t.Format(time.RFC822)
 }

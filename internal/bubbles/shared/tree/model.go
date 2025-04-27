@@ -19,6 +19,14 @@ import (
 
 type searchMode int
 
+type TemporaryGlue struct {
+	ID   string
+	Data any
+
+	Columns []string
+	Color   lipgloss.TerminalColor
+}
+
 const (
 	searchModeOff searchMode = iota
 	searchModeInit
@@ -43,8 +51,7 @@ type Node struct {
 	Label   string
 	Details map[string]string
 
-	Selected ColorConfig
-	Color    lipgloss.TerminalColor
+	Color lipgloss.TerminalColor
 
 	Children []Node
 }
