@@ -221,13 +221,8 @@ func (m *Model) setColumns(gk schema.GroupKind) {
 }
 
 func (m *Model) setNodes(data *xplane.Resource) {
-	nodes := []tree.Node{
-		{Label: "root", Children: make([]tree.Node, 1)},
-	}
-	m.kind = data.Unstructured.GroupVersionKind().GroupKind()
-	addNodes(m.kind, data, &nodes[0])
-
 	rows := []tree.TemporaryGlue{}
+	m.kind = data.Unstructured.GroupVersionKind().GroupKind()
 	m.traceToRows(data, &rows, 0)
 	m.tree.SetData(rows)
 
@@ -300,55 +295,6 @@ func (m Model) traceToRows(v *xplane.Resource, rows *[]tree.TemporaryGlue, depth
 
 	for _, cv := range v.Children {
 		m.traceToRows(cv, rows, depth+1)
-	}
-}
-
-func addNodes(kind schema.GroupKind, v *xplane.Resource, n *tree.Node) {
-	name := fmt.Sprintf("%s/%s", v.Unstructured.GetKind(), v.Unstructured.GetName())
-	group := v.Unstructured.GetObjectKind().GroupVersionKind().Group
-
-	n.Label = name
-	n.Key = fmt.Sprintf("%s.%s/%s", v.Unstructured.GetKind(), group, v.Unstructured.GetName())
-	n.Children = make([]tree.Node, len(v.Children))
-
-	if v.Unstructured.GetAnnotations()["crossplane.io/paused"] == "true" {
-		n.Label += " (paused)"
-		n.Color = lipgloss.ANSIColor(ansi.Yellow)
-	}
-
-	if xplane.IsPkg(kind) {
-		resStatus := xplane.GetPkgResourceStatus(v, name)
-		n.Details = map[string]string{
-			HeaderKeyVersion:       resStatus.Version,
-			HeaderKeyInstalled:     resStatus.Installed,
-			HeaderKeyInstalledLast: getTimeStr(resStatus.InstalledLastTransition),
-			HeaderKeyHealthy:       resStatus.Healthy,
-			HeaderKeyHealthyLast:   getTimeStr(resStatus.HealthyLastTransition),
-			HeaderKeyState:         resStatus.State,
-			HeaderKeyStatus:        resStatus.Status,
-		}
-		if !resStatus.Ok {
-			n.Color = lipgloss.ANSIColor(ansi.Red)
-		}
-	} else {
-		resStatus := xplane.GetResourceStatus(v, name)
-		n.Details = map[string]string{
-			HeaderKeyGroup:      group,
-			HeaderKeySynced:     resStatus.Synced,
-			HeaderKeySyncedLast: getTimeStr(resStatus.SyncedLastTransition),
-			HeaderKeyReady:      resStatus.Ready,
-			HeaderKeyReadyLast:  getTimeStr(resStatus.ReadyLastTransition),
-			HeaderKeyStatus:     resStatus.Status,
-		}
-		if !resStatus.Ok {
-			n.Color = lipgloss.ANSIColor(ansi.Red)
-		}
-	}
-	n.Value = v
-
-	for k, cv := range v.Children {
-		n.Children[k] = tree.Node{}
-		addNodes(kind, cv, &n.Children[k])
 	}
 }
 
