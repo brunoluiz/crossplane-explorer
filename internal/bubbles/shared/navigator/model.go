@@ -44,18 +44,6 @@ type ColorConfig struct {
 	Background lipgloss.ANSIColor
 }
 
-type Node struct {
-	Key   string
-	Value any
-
-	Label   string
-	Details map[string]string
-
-	Color lipgloss.TerminalColor
-
-	Children []Node
-}
-
 type Model struct {
 	KeyMap      KeyMap
 	Styles      Styles
@@ -65,12 +53,9 @@ type Model struct {
 	statusbar   statusbar.Model
 	logger      *slog.Logger
 
-	width         int
-	height        int
-	nodes         []Node
-	nodesByCursor map[int]*Node
-	pathByNode    map[*Node][]string
-	cursor        int
+	width  int
+	height int
+	cursor int
 
 	showHelp        bool
 	searchMode      searchMode
@@ -97,10 +82,8 @@ func New(
 		KeyMap:      DefaultKeyMap(),
 		Styles:      DefaultStyles(),
 
-		width:         0,
-		height:        0,
-		nodesByCursor: map[int]*Node{},
-		pathByNode:    map[*Node][]string{},
+		width:  0,
+		height: 0,
 
 		showHelp: false,
 		Help:     help.New(),

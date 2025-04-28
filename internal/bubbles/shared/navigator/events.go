@@ -73,10 +73,6 @@ func (m *Model) onNavDown() {
 	// m.onSelectionChange(m.nodesByCursor[m.cursor])
 }
 
-func (m *Model) onSelectionChange(node *Node) {
-	// m.statusbar.SetPath(m.pathByNode[node])
-}
-
 func (m *Model) onSearch(msg tea.KeyMsg) tea.Cmd {
 	switch {
 	case key.Matches(msg, m.KeyMap.SearchConfirm):
