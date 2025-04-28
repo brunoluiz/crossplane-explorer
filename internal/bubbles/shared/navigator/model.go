@@ -133,17 +133,18 @@ func (m Model) View() string {
 	}
 
 	components = append(components, m.statusbar.View())
-	tree := m.renderTable(availableHeight)
+	m.table.SetHeight(availableHeight)
+	tree := m.table.View()
 
 	return lipgloss.JoinVertical(lipgloss.Left, append([]string{tree}, components...)...)
 }
 
 func (m *Model) SetData(data []DataRow) {
 	m.data = data
-	m.table.Focus()
+	m.loadTable()
 }
 
-func (m *Model) renderTable(height int) string {
+func (m *Model) loadTable() {
 	rows := []table.Row{}
 	searchTerm := strings.ToLower(m.searchInput.Value())
 	for k, v := range m.data {
@@ -164,9 +165,8 @@ func (m *Model) renderTable(height int) string {
 		rows = append(rows, cols)
 	}
 
-	m.table.SetHeight(height)
 	m.table.SetRows(rows)
-	return m.table.View()
+	m.table.Focus()
 }
 
 func (m *Model) SetColumns(cc []table.Column) {
