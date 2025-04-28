@@ -3,6 +3,7 @@ package explorer
 import (
 	"time"
 
+	"github.com/atotto/clipboard"
 	xviewer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/viewer"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/viewer"
@@ -29,6 +30,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case navigator.EventQuit:
 		return m, tea.Interrupt
+	case navigator.EventCopy:
+		//nolint // ignore errors
+		clipboard.WriteAll(msg.ID)
 	case navigator.EventShow:
 		trace, ok := msg.Data.(*xplane.Resource)
 		if !ok {

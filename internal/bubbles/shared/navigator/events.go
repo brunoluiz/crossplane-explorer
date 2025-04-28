@@ -3,11 +3,15 @@ package navigator
 import (
 	"strings"
 
-	"github.com/atotto/clipboard"
 	"github.com/charmbracelet/bubbles/key"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
+
+type EventCopy struct {
+	ID   string
+	Data any
+}
 
 type EventShow struct {
 	ID   string
@@ -167,14 +171,14 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 		m.showHelp = !m.showHelp
 		// m.Help.ShowAll = !m.Help.ShowAll
 	case key.Matches(msg, m.KeyMap.Copy):
-		//nolint // ignore errors
-		clipboard.WriteAll(m.Current().ID)
+		return func() tea.Msg {
+			return EventCopy{ID: m.Current().ID, Data: m.Current().Data}
+		}
 	case key.Matches(msg, m.KeyMap.SearchQuit):
 		m.onSearchQuit()
 	case key.Matches(msg, m.KeyMap.Show):
 		return func() tea.Msg {
-			curr := m.Current()
-			return EventShow{ID: curr.ID, Data: curr.Data}
+			return EventShow{ID: m.Current().ID, Data: m.Current().Data}
 		}
 	case key.Matches(msg, m.KeyMap.Quit):
 		return func() tea.Msg {
