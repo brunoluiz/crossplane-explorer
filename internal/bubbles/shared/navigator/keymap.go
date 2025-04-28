@@ -56,12 +56,12 @@ func DefaultKeyMap() KeyMap {
 			key.WithHelp("/", "search"),
 		),
 		SearchNext: key.NewBinding(
-			key.WithKeys("N"),
-			key.WithHelp("N", "search next"),
+			key.WithKeys("n"),
+			key.WithHelp("n", "search next"),
 		),
 		SearchPrevious: key.NewBinding(
-			key.WithKeys("n"),
-			key.WithHelp("n", "search previous"),
+			key.WithKeys("N"),
+			key.WithHelp("N", "search previous"),
 		),
 		SearchConfirm: key.NewBinding(
 			key.WithKeys("enter"),

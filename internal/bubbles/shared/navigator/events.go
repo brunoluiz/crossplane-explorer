@@ -81,7 +81,8 @@ func (m *Model) onSearch(msg tea.KeyMsg) tea.Cmd {
 		m.searchResult = m.searchInput.Value()
 		m.searchInput.Blur()
 		m.searchMode = searchModeFilter
-		// m.doSearch()
+		m.doSearch()
+		m.loadTable()
 	case key.Matches(msg, m.KeyMap.SearchQuit):
 		m.searchInput.Blur()
 		m.searchMode = searchModeOff
@@ -101,6 +102,7 @@ func (m *Model) doSearch() {
 	}
 	if len(m.searchResultPos) > 0 {
 		m.cursor = m.searchResultPos[0]
+		m.table.SetCursor(m.cursor)
 	}
 }
 
@@ -125,6 +127,7 @@ func (m *Model) onSearchNext() {
 		m.searchCursor = 0 // Wrap around to the first result
 	}
 	m.cursor = m.searchResultPos[m.searchCursor]
+	m.table.SetCursor(m.cursor)
 }
 
 func (m *Model) onSearchPrev() {
@@ -133,6 +136,7 @@ func (m *Model) onSearchPrev() {
 		m.searchCursor = len(m.searchResultPos) - 1 // Wrap around to the last result
 	}
 	m.cursor = m.searchResultPos[m.searchCursor]
+	m.table.SetCursor(m.cursor)
 }
 
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
