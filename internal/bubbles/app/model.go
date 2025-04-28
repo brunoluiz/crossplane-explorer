@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/viewer"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/table"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/tree"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -49,7 +49,7 @@ type Tracer interface {
 
 type Model struct {
 	keyMap        KeyMap
-	tree          tree.Model
+	navigator     navigator.Model
 	viewer        viewer.Model
 	tracer        Tracer
 	width         int
@@ -87,7 +87,7 @@ func WithShortColumns(enabled bool) func(*Model) {
 
 func New(
 	logger *slog.Logger,
-	treeModel tree.Model,
+	treeModel navigator.Model,
 	viewerModel viewer.Model,
 	tracer Tracer,
 	opts ...WithOpt,
@@ -95,7 +95,7 @@ func New(
 	m := &Model{
 		keyMap:        DefaultKeyMap(),
 		logger:        logger,
-		tree:          treeModel,
+		navigator:     treeModel,
 		viewer:        viewerModel,
 		tracer:        tracer,
 		width:         0,
@@ -136,7 +136,7 @@ func (m Model) View() string {
 	case PaneTree:
 		return lipgloss.JoinVertical(
 			lipgloss.Left,
-			m.tree.View(),
+			m.navigator.View(),
 		)
 	default:
 		return "No pane selected"
@@ -217,16 +217,14 @@ func (m Model) getLayout(gk schema.GroupKind) ColumnLayout {
 }
 
 func (m *Model) setColumns(gk schema.GroupKind) {
-	m.tree.SetColumns(m.getColumns(m.getLayout(gk)))
+	m.navigator.SetColumns(m.getColumns(m.getLayout(gk)))
 }
 
 func (m *Model) setNodes(data *xplane.Resource) {
-	rows := []tree.TemporaryGlue{}
+	rows := []navigator.TemporaryGlue{}
 	m.kind = data.Unstructured.GroupVersionKind().GroupKind()
 	m.traceToRows(data, &rows, 0)
-	m.tree.SetData(rows)
-
-	// m.tree.SetNodes(nodes)
+	m.navigator.SetData(rows)
 }
 
 func (m *Model) setIrrecoverableError(err error) {
@@ -234,12 +232,12 @@ func (m *Model) setIrrecoverableError(err error) {
 	m.pane = PaneIrrecoverableError
 }
 
-func (m Model) traceToRows(v *xplane.Resource, rows *[]tree.TemporaryGlue, depth int) {
+func (m Model) traceToRows(v *xplane.Resource, rows *[]navigator.TemporaryGlue, depth int) {
 	const treeNodePrefix string = " └─"
 
 	label := fmt.Sprintf("%s/%s", v.Unstructured.GetKind(), v.Unstructured.GetName())
 	group := v.Unstructured.GetObjectKind().GroupVersionKind().Group
-	row := tree.TemporaryGlue{
+	row := navigator.TemporaryGlue{
 		ID:      fmt.Sprintf("%s.%s/%s", v.Unstructured.GetKind(), group, v.Unstructured.GetName()),
 		Data:    v,
 		Columns: []string{},

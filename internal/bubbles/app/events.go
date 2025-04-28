@@ -4,7 +4,7 @@ import (
 	"time"
 
 	xviewer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/viewer"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/tree"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/viewer"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	"github.com/charmbracelet/bubbles/key"
@@ -27,9 +27,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case viewer.EventQuit:
 		m.pane = PaneTree
 		return m, nil
-	case tree.EventQuit:
+	case navigator.EventQuit:
 		return m, tea.Interrupt
-	case tree.EventShow:
+	case navigator.EventShow:
 		trace, ok := msg.Data.(*xplane.Resource)
 		if !ok {
 			return m, nil
@@ -49,7 +49,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Batch(cmd, viewerCmd)
 	case PaneTree:
 		var treeCmd, statusCmd tea.Cmd
-		m.tree, treeCmd = m.tree.Update(msg)
+		m.navigator, treeCmd = m.navigator.Update(msg)
 
 		return m, tea.Batch(cmd, statusCmd, treeCmd)
 	case PaneIrrecoverableError:
@@ -80,7 +80,7 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 	m.height = msg.Height
 
 	top, right, _, left := lipgloss.NewStyle().Padding(1).GetPadding()
-	m.tree, _ = m.tree.Update(tea.WindowSizeMsg{Width: m.width - right - left, Height: m.height - top})
+	m.navigator, _ = m.navigator.Update(tea.WindowSizeMsg{Width: m.width - right - left, Height: m.height - top})
 	m.viewer, _ = m.viewer.Update(msg)
 
 	return nil

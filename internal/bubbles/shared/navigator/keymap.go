@@ -1,4 +1,4 @@
-package tree
+package navigator
 
 import "github.com/charmbracelet/bubbles/key"
 
