@@ -60,6 +60,7 @@ func (m *Model) onNavUp() {
 	if m.cursor < 0 {
 		m.cursor = 0
 	}
+	m.loadTable()
 	// m.onSelectionChange(m.nodesByCursor[m.cursor])
 }
 
@@ -68,6 +69,7 @@ func (m *Model) onNavDown() {
 	if m.cursor >= len(m.data) {
 		m.cursor = len(m.data) - 1
 	}
+	m.loadTable()
 	// m.onSelectionChange(m.nodesByCursor[m.cursor])
 }
 
@@ -109,7 +111,9 @@ func (m *Model) doSearch() {
 
 func (m *Model) onSearchInit() {
 	m.searchMode = searchModeInit
+	m.searchInput.Reset()
 	m.searchInput.Focus()
+	m.searchResult = ""
 }
 
 func (m *Model) onSearchQuit() {
@@ -117,9 +121,12 @@ func (m *Model) onSearchQuit() {
 		return
 	}
 	m.searchInput.Blur()
+	m.searchInput.Reset()
 	m.searchMode = searchModeOff
 	m.searchResult = ""
-	m.searchInput.Reset()
+	m.searchCursor = 0
+	m.searchResultPos = []int{}
+	m.loadTable()
 }
 
 func (m *Model) onSearchNext() {
