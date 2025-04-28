@@ -101,6 +101,7 @@ func (m *Model) doSearch() {
 		}
 	}
 	if len(m.searchResultPos) > 0 {
+		m.searchCursor = 0
 		m.cursor = m.searchResultPos[0]
 		m.table.SetCursor(m.cursor)
 	}
@@ -122,6 +123,10 @@ func (m *Model) onSearchQuit() {
 }
 
 func (m *Model) onSearchNext() {
+	if len(m.searchResultPos) == 0 {
+		return
+	}
+
 	m.searchCursor++
 	if m.searchCursor >= len(m.searchResultPos) {
 		m.searchCursor = 0 // Wrap around to the first result
@@ -131,6 +136,10 @@ func (m *Model) onSearchNext() {
 }
 
 func (m *Model) onSearchPrev() {
+	if len(m.searchResultPos) == 0 {
+		return
+	}
+
 	m.searchCursor--
 	if m.searchCursor < 0 {
 		m.searchCursor = len(m.searchResultPos) - 1 // Wrap around to the last result
