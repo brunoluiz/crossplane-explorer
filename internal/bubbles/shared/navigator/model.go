@@ -72,9 +72,11 @@ type Model struct {
 	pathByNode    map[*Node][]string
 	cursor        int
 
-	showHelp     bool
-	searchMode   searchMode
-	searchResult string
+	showHelp        bool
+	searchMode      searchMode
+	searchResult    string
+	searchCursor    int
+	searchResultPos []int
 
 	data []DataRow
 }
@@ -102,6 +104,9 @@ func New(
 
 		showHelp: false,
 		Help:     help.New(),
+
+		searchCursor:    0,
+		searchResultPos: []int{},
 	}
 }
 

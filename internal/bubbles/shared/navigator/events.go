@@ -1,6 +1,8 @@
 package navigator
 
 import (
+	"strings"
+
 	"github.com/atotto/clipboard"
 	"github.com/charmbracelet/bubbles/key"
 
@@ -79,6 +81,7 @@ func (m *Model) onSearch(msg tea.KeyMsg) tea.Cmd {
 		m.searchResult = m.searchInput.Value()
 		m.searchInput.Blur()
 		m.searchMode = searchModeFilter
+		// m.doSearch()
 	case key.Matches(msg, m.KeyMap.SearchQuit):
 		m.searchInput.Blur()
 		m.searchMode = searchModeOff
@@ -86,6 +89,19 @@ func (m *Model) onSearch(msg tea.KeyMsg) tea.Cmd {
 		m.searchInput.Reset()
 	}
 	return nil
+}
+
+func (m *Model) doSearch() {
+	searchTerm := strings.ToLower(m.searchInput.Value())
+	m.searchResultPos = []int{}
+	for i, v := range m.data {
+		if strings.Contains(strings.ToLower(v.ID), searchTerm) {
+			m.searchResultPos = append(m.searchResultPos, i)
+		}
+	}
+	if len(m.searchResultPos) > 0 {
+		m.cursor = m.searchResultPos[0]
+	}
 }
 
 func (m *Model) onSearchInit() {
@@ -104,17 +120,19 @@ func (m *Model) onSearchQuit() {
 }
 
 func (m *Model) onSearchNext() {
-	m.cursor++
-	if m.cursor >= len(m.data) {
-		m.cursor = 0 // Wrap around to the first result
+	m.searchCursor++
+	if m.searchCursor >= len(m.searchResultPos) {
+		m.searchCursor = 0 // Wrap around to the first result
 	}
+	m.cursor = m.searchResultPos[m.searchCursor]
 }
 
 func (m *Model) onSearchPrev() {
-	m.cursor--
-	if m.cursor < 0 {
-		m.cursor = len(m.data) - 1 // Wrap around to the last result
+	m.searchCursor--
+	if m.searchCursor < 0 {
+		m.searchCursor = len(m.searchResultPos) - 1 // Wrap around to the last result
 	}
+	m.cursor = m.searchResultPos[m.searchCursor]
 }
 
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
