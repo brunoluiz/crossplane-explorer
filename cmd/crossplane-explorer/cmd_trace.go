@@ -8,9 +8,9 @@ import (
 
 	explorer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/app"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/viewer"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator/statusbar"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/table"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/tree"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/tree/statusbar"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -52,7 +52,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 			app := tea.NewProgram(
 				explorer.New(
 					logger,
-					tree.New(
+					navigator.New(
 						logger,
 						table.New(
 							table.WithFocused(true),

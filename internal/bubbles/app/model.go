@@ -3,14 +3,16 @@ package explorer
 import (
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/viewer"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/table"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/tree"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/x/ansi"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
@@ -47,7 +49,7 @@ type Tracer interface {
 
 type Model struct {
 	keyMap        KeyMap
-	tree          tree.Model
+	navigator     navigator.Model
 	viewer        viewer.Model
 	tracer        Tracer
 	width         int
@@ -57,9 +59,10 @@ type Model struct {
 	watchInterval time.Duration
 	logger        *slog.Logger
 
-	pane      Pane
-	err       error
-	resByNode map[*tree.Node]*xplane.Resource
+	pane Pane
+	err  error
+
+	kind schema.GroupKind
 }
 
 type WithOpt func(*Model)
@@ -84,7 +87,7 @@ func WithShortColumns(enabled bool) func(*Model) {
 
 func New(
 	logger *slog.Logger,
-	treeModel tree.Model,
+	treeModel navigator.Model,
 	viewerModel viewer.Model,
 	tracer Tracer,
 	opts ...WithOpt,
@@ -92,7 +95,7 @@ func New(
 	m := &Model{
 		keyMap:        DefaultKeyMap(),
 		logger:        logger,
-		tree:          treeModel,
+		navigator:     treeModel,
 		viewer:        viewerModel,
 		tracer:        tracer,
 		width:         0,
@@ -100,8 +103,7 @@ func New(
 		watchInterval: 10 * time.Second,
 		short:         true,
 
-		pane:      PaneTree,
-		resByNode: map[*tree.Node]*xplane.Resource{},
+		pane: PaneTree,
 	}
 
 	for _, opt := range opts {
@@ -134,7 +136,7 @@ func (m Model) View() string {
 	case PaneTree:
 		return lipgloss.JoinVertical(
 			lipgloss.Left,
-			m.tree.View(),
+			m.navigator.View(),
 		)
 	default:
 		return "No pane selected"
@@ -196,34 +198,107 @@ func (m Model) getColumns(layout ColumnLayout) []table.Column {
 	}
 }
 
-func (m *Model) setColumns(gk schema.GroupKind) {
+func (m Model) getLayout(gk schema.GroupKind) ColumnLayout {
 	isPkg := xplane.IsPkg(gk)
 	isRes, isWide, isShort := !isPkg, !m.short, m.short
 
 	switch {
 	case isPkg && isShort:
-		m.tree.SetColumns(m.getColumns(ShortPkgColumnLayout))
+		return ShortPkgColumnLayout
 	case isPkg && isWide:
-		m.tree.SetColumns(m.getColumns(WidePkgColumnLayout))
+		return WidePkgColumnLayout
 	case isRes && isShort:
-		m.tree.SetColumns(m.getColumns(ShortObjectColumnLayout))
+		return ShortObjectColumnLayout
 	case isRes && isWide:
-		m.tree.SetColumns(m.getColumns(WideObjectColumnLayout))
+		return WideObjectColumnLayout
+	default:
+		return UnknownColumnLayout
 	}
 }
 
+func (m *Model) setColumns(gk schema.GroupKind) {
+	m.navigator.SetColumns(m.getColumns(m.getLayout(gk)))
+}
+
 func (m *Model) setNodes(data *xplane.Resource) {
-	nodes := []tree.Node{
-		{Label: "root", Children: make([]tree.Node, 1)},
-	}
-	resByNode := map[*tree.Node]*xplane.Resource{}
-	kind := data.Unstructured.GroupVersionKind().GroupKind()
-	addNodes(kind, data, &nodes[0])
-	m.tree.SetNodes(nodes)
-	m.resByNode = resByNode
+	rows := []navigator.DataRow{}
+	m.kind = data.Unstructured.GroupVersionKind().GroupKind()
+	m.traceToRows(data, &rows, 0)
+	m.navigator.SetData(rows)
 }
 
 func (m *Model) setIrrecoverableError(err error) {
 	m.err = err
 	m.pane = PaneIrrecoverableError
+}
+
+func (m Model) traceToRows(v *xplane.Resource, rows *[]navigator.DataRow, depth int) {
+	const treeNodePrefix string = " └─"
+
+	label := fmt.Sprintf("%s/%s", v.Unstructured.GetKind(), v.Unstructured.GetName())
+	group := v.Unstructured.GetObjectKind().GroupVersionKind().Group
+	row := navigator.DataRow{
+		ID:      fmt.Sprintf("%s.%s/%s", v.Unstructured.GetKind(), group, v.Unstructured.GetName()),
+		Data:    v,
+		Columns: []string{},
+	}
+
+	if depth > 0 {
+		shape := strings.Repeat(" ", (depth-1)) + treeNodePrefix + " "
+		label = shape + label
+	}
+
+	if v.Unstructured.GetAnnotations()["crossplane.io/paused"] == "true" {
+		label += " (paused)"
+		row.Color = lipgloss.ANSIColor(ansi.Yellow)
+	}
+
+	data := map[string]string{}
+	if xplane.IsPkg(m.kind) {
+		resStatus := xplane.GetPkgResourceStatus(v, label)
+		data = map[string]string{
+			HeaderKeyObject:        label,
+			HeaderKeyGroup:         group,
+			HeaderKeyVersion:       resStatus.Version,
+			HeaderKeyInstalled:     resStatus.Installed,
+			HeaderKeyInstalledLast: getTimeStr(resStatus.InstalledLastTransition),
+			HeaderKeyHealthy:       resStatus.Healthy,
+			HeaderKeyHealthyLast:   getTimeStr(resStatus.HealthyLastTransition),
+			HeaderKeyState:         resStatus.State,
+			HeaderKeyStatus:        resStatus.Status,
+		}
+		if !resStatus.Ok {
+			row.Color = lipgloss.ANSIColor(ansi.Red)
+		}
+	} else {
+		resStatus := xplane.GetResourceStatus(v, label)
+		data = map[string]string{
+			HeaderKeyObject:     label,
+			HeaderKeyGroup:      group,
+			HeaderKeySynced:     resStatus.Synced,
+			HeaderKeySyncedLast: getTimeStr(resStatus.SyncedLastTransition),
+			HeaderKeyReady:      resStatus.Ready,
+			HeaderKeyReadyLast:  getTimeStr(resStatus.ReadyLastTransition),
+			HeaderKeyStatus:     resStatus.Status,
+		}
+		if !resStatus.Ok {
+			row.Color = lipgloss.ANSIColor(ansi.Red)
+		}
+	}
+
+	for _, col := range m.getColumns(m.getLayout(m.kind)) {
+		row.Columns = append(row.Columns, data[col.Title])
+	}
+	*rows = append(*rows, row)
+
+	for _, cv := range v.Children {
+		m.traceToRows(cv, rows, depth+1)
+	}
+}
+
+func getTimeStr(t time.Time) string {
+	if t.IsZero() {
+		return "-"
+	}
+	return t.Format(time.RFC822)
 }

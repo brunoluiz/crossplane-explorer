@@ -1,6 +1,8 @@
-package tree
+package navigator
 
 import (
+	"strings"
+
 	"github.com/atotto/clipboard"
 	"github.com/charmbracelet/bubbles/key"
 
@@ -8,7 +10,8 @@ import (
 )
 
 type EventShow struct {
-	Node Node
+	ID   string
+	Data any
 }
 
 type EventQuit struct{}
@@ -57,19 +60,21 @@ func (m *Model) onNavUp() {
 	if m.cursor < 0 {
 		m.cursor = 0
 	}
-	m.onSelectionChange(m.nodesByCursor[m.cursor])
+	m.doLoadTable()
+	// m.onSelectionChange(m.nodesByCursor[m.cursor])
 }
 
 func (m *Model) onNavDown() {
 	m.cursor++
-	if m.cursor >= m.numberOfNodes() {
-		m.cursor = m.numberOfNodes() - 1
+	if m.cursor >= len(m.data) {
+		m.cursor = len(m.data) - 1
 	}
-	m.onSelectionChange(m.nodesByCursor[m.cursor])
+	m.doLoadTable()
+	// m.onSelectionChange(m.nodesByCursor[m.cursor])
 }
 
 func (m *Model) onSelectionChange(node *Node) {
-	m.statusbar.SetPath(m.pathByNode[node])
+	// m.statusbar.SetPath(m.pathByNode[node])
 }
 
 func (m *Model) onSearch(msg tea.KeyMsg) tea.Cmd {
@@ -78,6 +83,8 @@ func (m *Model) onSearch(msg tea.KeyMsg) tea.Cmd {
 		m.searchResult = m.searchInput.Value()
 		m.searchInput.Blur()
 		m.searchMode = searchModeFilter
+		m.doSearch()
+		m.doLoadTable()
 	case key.Matches(msg, m.KeyMap.SearchQuit):
 		m.searchInput.Blur()
 		m.searchMode = searchModeOff
@@ -87,9 +94,26 @@ func (m *Model) onSearch(msg tea.KeyMsg) tea.Cmd {
 	return nil
 }
 
+func (m *Model) doSearch() {
+	searchTerm := strings.ToLower(m.searchInput.Value())
+	m.searchResultPos = []int{}
+	for i, v := range m.data {
+		if strings.Contains(strings.ToLower(v.ID), searchTerm) {
+			m.searchResultPos = append(m.searchResultPos, i)
+		}
+	}
+	if len(m.searchResultPos) > 0 {
+		m.searchCursor = 0
+		m.cursor = m.searchResultPos[0]
+		m.table.SetCursor(m.cursor)
+	}
+}
+
 func (m *Model) onSearchInit() {
 	m.searchMode = searchModeInit
+	m.searchInput.Reset()
 	m.searchInput.Focus()
+	m.searchResult = ""
 }
 
 func (m *Model) onSearchQuit() {
@@ -97,9 +121,38 @@ func (m *Model) onSearchQuit() {
 		return
 	}
 	m.searchInput.Blur()
+	m.searchInput.Reset()
 	m.searchMode = searchModeOff
 	m.searchResult = ""
-	m.searchInput.Reset()
+	m.searchCursor = 0
+	m.searchResultPos = []int{}
+	m.doLoadTable()
+}
+
+func (m *Model) onSearchNext() {
+	if len(m.searchResultPos) == 0 {
+		return
+	}
+
+	m.searchCursor++
+	if m.searchCursor >= len(m.searchResultPos) {
+		m.searchCursor = 0 // Wrap around to the first result
+	}
+	m.cursor = m.searchResultPos[m.searchCursor]
+	m.table.SetCursor(m.cursor)
+}
+
+func (m *Model) onSearchPrev() {
+	if len(m.searchResultPos) == 0 {
+		return
+	}
+
+	m.searchCursor--
+	if m.searchCursor < 0 {
+		m.searchCursor = len(m.searchResultPos) - 1 // Wrap around to the last result
+	}
+	m.cursor = m.searchResultPos[m.searchCursor]
+	m.table.SetCursor(m.cursor)
 }
 
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
@@ -119,17 +172,22 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 		// m.Help.ShowAll = !m.Help.ShowAll
 	case key.Matches(msg, m.KeyMap.Copy):
 		//nolint // ignore errors
-		clipboard.WriteAll(m.Current().Key)
+		clipboard.WriteAll(m.Current().ID)
 	case key.Matches(msg, m.KeyMap.SearchQuit):
 		m.onSearchQuit()
 	case key.Matches(msg, m.KeyMap.Show):
 		return func() tea.Msg {
-			return EventShow{Node: m.Current()}
+			curr := m.Current()
+			return EventShow{ID: curr.ID, Data: curr.Data}
 		}
 	case key.Matches(msg, m.KeyMap.Quit):
 		return func() tea.Msg {
 			return EventQuit{}
 		}
+	case key.Matches(msg, m.KeyMap.SearchNext):
+		m.onSearchNext()
+	case key.Matches(msg, m.KeyMap.SearchPrevious):
+		m.onSearchPrev()
 	}
 	return nil
 }

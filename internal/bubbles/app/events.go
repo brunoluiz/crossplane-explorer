@@ -1,18 +1,15 @@
 package explorer
 
 import (
-	"fmt"
 	"time"
 
 	xviewer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/viewer"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/tree"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/viewer"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/x/ansi"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -30,10 +27,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case viewer.EventQuit:
 		m.pane = PaneTree
 		return m, nil
-	case tree.EventQuit:
+	case navigator.EventQuit:
 		return m, tea.Interrupt
-	case tree.EventShow:
-		trace, ok := msg.Node.Value.(*xplane.Resource)
+	case navigator.EventShow:
+		trace, ok := msg.Data.(*xplane.Resource)
 		if !ok {
 			return m, nil
 		}
@@ -52,7 +49,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Batch(cmd, viewerCmd)
 	case PaneTree:
 		var treeCmd, statusCmd tea.Cmd
-		m.tree, treeCmd = m.tree.Update(msg)
+		m.navigator, treeCmd = m.navigator.Update(msg)
 
 		return m, tea.Batch(cmd, statusCmd, treeCmd)
 	case PaneIrrecoverableError:
@@ -83,7 +80,7 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 	m.height = msg.Height
 
 	top, right, _, left := lipgloss.NewStyle().Padding(1).GetPadding()
-	m.tree, _ = m.tree.Update(tea.WindowSizeMsg{Width: m.width - right - left, Height: m.height - top})
+	m.navigator, _ = m.navigator.Update(tea.WindowSizeMsg{Width: m.width - right - left, Height: m.height - top})
 	m.viewer, _ = m.viewer.Update(msg)
 
 	return nil
@@ -96,60 +93,4 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	}
 
 	return nil
-}
-
-func addNodes(kind schema.GroupKind, v *xplane.Resource, n *tree.Node) {
-	name := fmt.Sprintf("%s/%s", v.Unstructured.GetKind(), v.Unstructured.GetName())
-	group := v.Unstructured.GetObjectKind().GroupVersionKind().Group
-
-	n.Label = name
-	n.Key = fmt.Sprintf("%s.%s/%s", v.Unstructured.GetKind(), group, v.Unstructured.GetName())
-	n.Children = make([]tree.Node, len(v.Children))
-
-	if v.Unstructured.GetAnnotations()["crossplane.io/paused"] == "true" {
-		n.Label += " (paused)"
-		n.Color = lipgloss.ANSIColor(ansi.Yellow)
-	}
-
-	if xplane.IsPkg(kind) {
-		resStatus := xplane.GetPkgResourceStatus(v, name)
-		n.Details = map[string]string{
-			HeaderKeyVersion:       resStatus.Version,
-			HeaderKeyInstalled:     resStatus.Installed,
-			HeaderKeyInstalledLast: getTimeStr(resStatus.InstalledLastTransition),
-			HeaderKeyHealthy:       resStatus.Healthy,
-			HeaderKeyHealthyLast:   getTimeStr(resStatus.HealthyLastTransition),
-			HeaderKeyState:         resStatus.State,
-			HeaderKeyStatus:        resStatus.Status,
-		}
-		if !resStatus.Ok {
-			n.Color = lipgloss.ANSIColor(ansi.Red)
-		}
-	} else {
-		resStatus := xplane.GetResourceStatus(v, name)
-		n.Details = map[string]string{
-			HeaderKeyGroup:      group,
-			HeaderKeySynced:     resStatus.Synced,
-			HeaderKeySyncedLast: getTimeStr(resStatus.SyncedLastTransition),
-			HeaderKeyReady:      resStatus.Ready,
-			HeaderKeyReadyLast:  getTimeStr(resStatus.ReadyLastTransition),
-			HeaderKeyStatus:     resStatus.Status,
-		}
-		if !resStatus.Ok {
-			n.Color = lipgloss.ANSIColor(ansi.Red)
-		}
-	}
-	n.Value = v
-
-	for k, cv := range v.Children {
-		n.Children[k] = tree.Node{}
-		addNodes(kind, cv, &n.Children[k])
-	}
-}
-
-func getTimeStr(t time.Time) string {
-	if t.IsZero() {
-		return "-"
-	}
-	return t.Format(time.RFC822)
 }

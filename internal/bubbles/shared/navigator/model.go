@@ -1,4 +1,4 @@
-package tree
+package navigator
 
 import (
 	"fmt"
@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator/statusbar"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/table"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/tree/statusbar"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -18,6 +18,14 @@ import (
 )
 
 type searchMode int
+
+type DataRow struct {
+	ID   string
+	Data any
+
+	Columns []string
+	Color   lipgloss.TerminalColor
+}
 
 const (
 	searchModeOff searchMode = iota
@@ -43,8 +51,7 @@ type Node struct {
 	Label   string
 	Details map[string]string
 
-	Selected ColorConfig
-	Color    lipgloss.TerminalColor
+	Color lipgloss.TerminalColor
 
 	Children []Node
 }
@@ -65,9 +72,13 @@ type Model struct {
 	pathByNode    map[*Node][]string
 	cursor        int
 
-	showHelp     bool
-	searchMode   searchMode
-	searchResult string
+	showHelp        bool
+	searchMode      searchMode
+	searchResult    string
+	searchCursor    int
+	searchResultPos []int
+
+	data []DataRow
 }
 
 func New(
@@ -93,6 +104,9 @@ func New(
 
 		showHelp: false,
 		Help:     help.New(),
+
+		searchCursor:    0,
+		searchResultPos: []int{},
 	}
 }
 
@@ -124,32 +138,40 @@ func (m Model) View() string {
 	}
 
 	components = append(components, m.statusbar.View())
-
-	m.loadTable(m.nodes)
 	m.table.SetHeight(availableHeight)
 	tree := m.table.View()
 
 	return lipgloss.JoinVertical(lipgloss.Left, append([]string{tree}, components...)...)
 }
 
-func (m *Model) SetNodes(nodes []Node) {
-	m.nodes = nodes
-
-	m.loadTable(m.nodes)
-	m.table.Focus()
-
-	// Set the path to the first item, since it will only render further values on cursor change
-	if m.cursor == 0 {
-		m.statusbar.SetPath([]string{nodes[0].Label})
-	}
+func (m *Model) SetData(data []DataRow) {
+	m.data = data
+	m.doLoadTable()
 }
 
-func (m *Model) loadTable(nodes []Node) []table.Row {
-	count := 0 // This is used to keep track of the index of the node we are on (important because we are using a recursive function)
+func (m *Model) doLoadTable() {
 	rows := []table.Row{}
-	m.renderTree(&rows, nodes, []string{}, 0, &count)
+	searchTerm := strings.ToLower(m.searchInput.Value())
+	for k, v := range m.data {
+		s := lipgloss.NewStyle()
+		if m.cursor != k {
+			s = s.Foreground(v.Color)
+		}
+
+		if m.searchMode == searchModeFilter && strings.Contains(strings.ToLower(v.ID), searchTerm) {
+			s = s.Bold(true).Foreground(lipgloss.Color("15")).Background(lipgloss.Color("1")) // White on red
+		}
+
+		cols := []table.Cell{}
+		for _, col := range v.Columns {
+			cols = append(cols, table.Cell{Value: col, Style: s})
+		}
+
+		rows = append(rows, cols)
+	}
+
 	m.table.SetRows(rows)
-	return rows
+	m.table.Focus()
 }
 
 func (m *Model) SetColumns(cc []table.Column) {
@@ -167,99 +189,21 @@ func (m *Model) SetColumns(cc []table.Column) {
 }
 
 func (m Model) ShortHelp() []key.Binding {
-	kb := []key.Binding{
-		m.KeyMap.Up,
-		m.KeyMap.Down,
-		m.KeyMap.Copy,
-		m.KeyMap.Show,
-		m.KeyMap.Search,
-		m.KeyMap.Help,
-	}
-
-	return append(kb,
-		m.KeyMap.Quit,
+	k := m.KeyMap
+	return append([]key.Binding{},
+		k.Up, k.Down, k.Copy, k.Show,
+		k.Search, k.Help, k.Quit,
 	)
 }
 
 func (m Model) FullHelp() [][]key.Binding {
-	kb := [][]key.Binding{{
-		m.KeyMap.Up,
-		m.KeyMap.Down,
-		m.KeyMap.Copy,
-		m.KeyMap.Show,
-	}}
-
-	return append(kb,
-		[]key.Binding{
-			m.KeyMap.Quit,
-			m.KeyMap.CloseFullHelp,
-		})
+	k := m.KeyMap
+	kb := [][]key.Binding{{k.Up, k.Down, k.Copy, k.Show}}
+	return append(kb, []key.Binding{k.Quit, k.CloseFullHelp})
 }
 
-func (m Model) Current() Node              { return *m.nodesByCursor[m.cursor] }
+func (m Model) Current() *DataRow          { return &m.data[m.cursor] }
 func (m *Model) setSize(width, height int) { m.width = width; m.height = height }
-
-func (m *Model) numberOfNodes() int {
-	count := 0
-
-	var countNodes func([]Node)
-	countNodes = func(nodes []Node) {
-		for _, node := range nodes {
-			count++
-			if node.Children != nil {
-				countNodes(node.Children)
-			}
-		}
-	}
-
-	countNodes(m.nodes)
-
-	return count
-}
-
-func (m *Model) renderTree(rows *[]table.Row, remainingNodes []Node, currentPath []string, indent int, count *int) {
-	const treeNodePrefix string = " └─"
-	searchTerm := strings.ToLower(m.searchInput.Value())
-
-	for _, node := range remainingNodes {
-		// If we aren't at the root, we add the arrow shape to the string
-		shape := ""
-		if indent > 0 {
-			shape = strings.Repeat(" ", (indent-1)) + treeNodePrefix + " "
-		}
-
-		// Generate the correct index for the node
-		idx := *count
-		*count++
-
-		s := lipgloss.NewStyle()
-		if m.cursor != idx {
-			s = s.Foreground(node.Color)
-		}
-
-		if m.searchMode == searchModeFilter && strings.Contains(strings.ToLower(node.Key), searchTerm) {
-			s = s.Bold(true).Foreground(lipgloss.Color("15")).Background(lipgloss.Color("1")) // White on red
-		}
-
-		cols := []table.Cell{{Value: shape + node.Label, Style: s}}
-		for _, v := range m.table.Columns()[1:] {
-			cols = append(cols, table.Cell{Value: node.Details[v.Title], Style: s})
-		}
-
-		*rows = append(*rows, cols)
-		m.nodesByCursor[idx] = &node
-
-		// Used to be able to trace back the path on the tree
-		path := make([]string, len(currentPath))
-		copy(path, currentPath)
-		path = append(path, node.Label)
-		m.pathByNode[&node] = path
-
-		if node.Children != nil {
-			m.renderTree(rows, node.Children, path, indent+1, count)
-		}
-	}
-}
 
 func (m Model) helpView() string {
 	m.Help.ShowAll = false

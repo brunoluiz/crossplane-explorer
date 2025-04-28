@@ -24,6 +24,5 @@ within the `events.go` file (might be called `handlers.go` in the future).
   - `explorer.addNode` seems to already do some recursive job and could be the method that translates it to rows
 - `tree` should be called `navigator`
   - `statusbar` should be removed
-- Packages should be reorganised as `common`, `layout` and `app`
 
 - In the `xplane` package, we should have something to output it
