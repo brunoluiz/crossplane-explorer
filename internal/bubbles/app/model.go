@@ -221,7 +221,7 @@ func (m *Model) setColumns(gk schema.GroupKind) {
 }
 
 func (m *Model) setNodes(data *xplane.Resource) {
-	rows := []navigator.TemporaryGlue{}
+	rows := []navigator.DataRow{}
 	m.kind = data.Unstructured.GroupVersionKind().GroupKind()
 	m.traceToRows(data, &rows, 0)
 	m.navigator.SetData(rows)
@@ -232,12 +232,12 @@ func (m *Model) setIrrecoverableError(err error) {
 	m.pane = PaneIrrecoverableError
 }
 
-func (m Model) traceToRows(v *xplane.Resource, rows *[]navigator.TemporaryGlue, depth int) {
+func (m Model) traceToRows(v *xplane.Resource, rows *[]navigator.DataRow, depth int) {
 	const treeNodePrefix string = " └─"
 
 	label := fmt.Sprintf("%s/%s", v.Unstructured.GetKind(), v.Unstructured.GetName())
 	group := v.Unstructured.GetObjectKind().GroupVersionKind().Group
-	row := navigator.TemporaryGlue{
+	row := navigator.DataRow{
 		ID:      fmt.Sprintf("%s.%s/%s", v.Unstructured.GetKind(), group, v.Unstructured.GetName()),
 		Data:    v,
 		Columns: []string{},

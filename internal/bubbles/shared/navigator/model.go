@@ -19,7 +19,7 @@ import (
 
 type searchMode int
 
-type TemporaryGlue struct {
+type DataRow struct {
 	ID   string
 	Data any
 
@@ -76,7 +76,7 @@ type Model struct {
 	searchMode   searchMode
 	searchResult string
 
-	data []TemporaryGlue
+	data []DataRow
 }
 
 func New(
@@ -138,7 +138,7 @@ func (m Model) View() string {
 	return lipgloss.JoinVertical(lipgloss.Left, append([]string{tree}, components...)...)
 }
 
-func (m *Model) SetData(data []TemporaryGlue) {
+func (m *Model) SetData(data []DataRow) {
 	m.data = data
 	m.table.Focus()
 }
@@ -213,7 +213,7 @@ func (m Model) FullHelp() [][]key.Binding {
 		})
 }
 
-func (m Model) Current() *TemporaryGlue    { return &m.data[m.cursor] }
+func (m Model) Current() *DataRow          { return &m.data[m.cursor] }
 func (m *Model) setSize(width, height int) { m.width = width; m.height = height }
 
 func (m Model) helpView() string {
