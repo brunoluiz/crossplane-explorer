@@ -103,6 +103,20 @@ func (m *Model) onSearchQuit() {
 	m.searchInput.Reset()
 }
 
+func (m *Model) onSearchNext() {
+	m.cursor++
+	if m.cursor >= len(m.data) {
+		m.cursor = 0 // Wrap around to the first result
+	}
+}
+
+func (m *Model) onSearchPrev() {
+	m.cursor--
+	if m.cursor < 0 {
+		m.cursor = len(m.data) - 1 // Wrap around to the last result
+	}
+}
+
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	if m.searchMode == searchModeInput {
 		return m.onSearch(msg)
@@ -132,6 +146,10 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 		return func() tea.Msg {
 			return EventQuit{}
 		}
+	case key.Matches(msg, m.KeyMap.SearchNext):
+		m.onSearchNext()
+	case key.Matches(msg, m.KeyMap.SearchPrevious):
+		m.onSearchPrev()
 	}
 	return nil
 }

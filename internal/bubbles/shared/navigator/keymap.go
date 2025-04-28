@@ -11,9 +11,11 @@ type KeyMap struct {
 	Up          key.Binding
 	Quit        key.Binding
 
-	Search        key.Binding
-	SearchConfirm key.Binding
-	SearchQuit    key.Binding
+	Search         key.Binding
+	SearchNext     key.Binding
+	SearchPrevious key.Binding
+	SearchConfirm  key.Binding
+	SearchQuit     key.Binding
 
 	Copy          key.Binding
 	Show          key.Binding
@@ -52,6 +54,14 @@ func DefaultKeyMap() KeyMap {
 		Search: key.NewBinding(
 			key.WithKeys("/"),
 			key.WithHelp("/", "search"),
+		),
+		SearchNext: key.NewBinding(
+			key.WithKeys("N"),
+			key.WithHelp("N", "search next"),
+		),
+		SearchPrevious: key.NewBinding(
+			key.WithKeys("n"),
+			key.WithHelp("n", "search previous"),
 		),
 		SearchConfirm: key.NewBinding(
 			key.WithKeys("enter"),
