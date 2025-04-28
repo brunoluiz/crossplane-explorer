@@ -85,7 +85,7 @@ func New(
 		width:  0,
 		height: 0,
 
-		showHelp: false,
+		showHelp: true,
 		Help:     help.New(),
 
 		searchCursor:    0,
