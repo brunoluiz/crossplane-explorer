@@ -164,8 +164,8 @@ func (m *Model) renderTable(height int) string {
 		rows = append(rows, cols)
 	}
 
-	m.table.SetRows(rows)
 	m.table.SetHeight(height)
+	m.table.SetRows(rows)
 	return m.table.View()
 }
 
