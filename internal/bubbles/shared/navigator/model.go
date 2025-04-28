@@ -146,10 +146,10 @@ func (m Model) View() string {
 
 func (m *Model) SetData(data []DataRow) {
 	m.data = data
-	m.loadTable()
+	m.doLoadTable()
 }
 
-func (m *Model) loadTable() {
+func (m *Model) doLoadTable() {
 	rows := []table.Row{}
 	searchTerm := strings.ToLower(m.searchInput.Value())
 	for k, v := range m.data {
@@ -189,33 +189,17 @@ func (m *Model) SetColumns(cc []table.Column) {
 }
 
 func (m Model) ShortHelp() []key.Binding {
-	kb := []key.Binding{
-		m.KeyMap.Up,
-		m.KeyMap.Down,
-		m.KeyMap.Copy,
-		m.KeyMap.Show,
-		m.KeyMap.Search,
-		m.KeyMap.Help,
-	}
-
-	return append(kb,
-		m.KeyMap.Quit,
+	k := m.KeyMap
+	return append([]key.Binding{},
+		k.Up, k.Down, k.Copy, k.Show,
+		k.Search, k.Help, k.Quit,
 	)
 }
 
 func (m Model) FullHelp() [][]key.Binding {
-	kb := [][]key.Binding{{
-		m.KeyMap.Up,
-		m.KeyMap.Down,
-		m.KeyMap.Copy,
-		m.KeyMap.Show,
-	}}
-
-	return append(kb,
-		[]key.Binding{
-			m.KeyMap.Quit,
-			m.KeyMap.CloseFullHelp,
-		})
+	k := m.KeyMap
+	kb := [][]key.Binding{{k.Up, k.Down, k.Copy, k.Show}}
+	return append(kb, []key.Binding{k.Quit, k.CloseFullHelp})
 }
 
 func (m Model) Current() *DataRow          { return &m.data[m.cursor] }

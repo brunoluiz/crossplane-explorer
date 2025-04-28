@@ -60,7 +60,7 @@ func (m *Model) onNavUp() {
 	if m.cursor < 0 {
 		m.cursor = 0
 	}
-	m.loadTable()
+	m.doLoadTable()
 	// m.onSelectionChange(m.nodesByCursor[m.cursor])
 }
 
@@ -69,7 +69,7 @@ func (m *Model) onNavDown() {
 	if m.cursor >= len(m.data) {
 		m.cursor = len(m.data) - 1
 	}
-	m.loadTable()
+	m.doLoadTable()
 	// m.onSelectionChange(m.nodesByCursor[m.cursor])
 }
 
@@ -84,7 +84,7 @@ func (m *Model) onSearch(msg tea.KeyMsg) tea.Cmd {
 		m.searchInput.Blur()
 		m.searchMode = searchModeFilter
 		m.doSearch()
-		m.loadTable()
+		m.doLoadTable()
 	case key.Matches(msg, m.KeyMap.SearchQuit):
 		m.searchInput.Blur()
 		m.searchMode = searchModeOff
@@ -126,7 +126,7 @@ func (m *Model) onSearchQuit() {
 	m.searchResult = ""
 	m.searchCursor = 0
 	m.searchResultPos = []int{}
-	m.loadTable()
+	m.doLoadTable()
 }
 
 func (m *Model) onSearchNext() {
