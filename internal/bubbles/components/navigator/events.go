@@ -142,11 +142,8 @@ func (m *Model) onSearchNext() tea.Cmd {
 	if m.searchCursor >= len(m.searchResultPos) {
 		m.searchCursor = 0 // Wrap around to the first result
 	}
-	return m.updateCursor(m.searchResultPos[m.searchCursor])
-}
 
-func (m *Model) updateCursor(cursor int) tea.Cmd {
-	m.cursor = cursor
+	m.cursor = m.searchResultPos[m.searchCursor]
 	m.table.SetCursor(m.cursor)
 	return func() tea.Msg {
 		return EventItemFocused{ID: m.Current().ID, Data: m.Current().Data}
@@ -162,7 +159,12 @@ func (m *Model) onSearchPrev() tea.Cmd {
 	if m.searchCursor < 0 {
 		m.searchCursor = len(m.searchResultPos) - 1 // Wrap around to the last result
 	}
-	return m.updateCursor(m.searchResultPos[m.searchCursor])
+
+	m.cursor = m.searchResultPos[m.searchCursor]
+	m.table.SetCursor(m.cursor)
+	return func() tea.Msg {
+		return EventItemFocused{ID: m.Current().ID, Data: m.Current().Data}
+	}
 }
 
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
