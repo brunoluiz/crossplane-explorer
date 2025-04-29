@@ -3,7 +3,7 @@ package xpsummary
 import (
 	"fmt"
 
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/viewer"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/viewer"
 	"github.com/brunoluiz/crossplane-explorer/internal/ds"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	tea "github.com/charmbracelet/bubbletea"
@@ -57,7 +57,7 @@ func (m *Model) SetContent(msg ContentInput) error {
 	return nil
 }
 
-// Helper function to check if a key has a specific suffix.
+// Helper function to check if a key has a specific suffix
 func keyHasSuffix(key, suffix string) bool {
 	if len(key) < len(suffix) {
 		return false

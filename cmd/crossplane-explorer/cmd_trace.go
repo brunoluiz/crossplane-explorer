@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/app"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/navigator"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/statusbar"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/table"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/navigator"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/statusbar"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/table"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/xpnavigator"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/xpsummary"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
