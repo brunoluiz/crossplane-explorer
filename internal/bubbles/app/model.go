@@ -23,6 +23,7 @@ type Model struct {
 	viewer    viewerpane.Model
 	navigator navigatorpane.Model
 	logger    *slog.Logger
+	dumper    func(...any)
 
 	pane Pane
 	err  error
@@ -32,6 +33,7 @@ type WithOpt func(*Model)
 
 func New(
 	logger *slog.Logger,
+	dumper func(...any),
 	navigatorModel navigatorpane.Model,
 	viewerModel viewerpane.Model,
 	opts ...WithOpt,
@@ -39,6 +41,7 @@ func New(
 	m := &Model{
 		keyMap:    DefaultKeyMap(),
 		logger:    logger,
+		dumper:    dumper,
 		navigator: navigatorModel,
 		viewer:    viewerModel,
 		pane:      PaneNavigator,
