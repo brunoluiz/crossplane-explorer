@@ -1,46 +1,63 @@
+version: "2"
 run:
-  timeout: 15m
   modules-download-mode: readonly
-
 output:
   formats:
-    - format: colored-line-number
-  print-issued-lines: true
-  print-linter-name: true
-
-linters-settings:
-  dupl:
-    threshold: 100
-  funlen:
-    lines: 100
-    statements: 50
-  errcheck:
-    check-type-assertions: true
-    check-blank: true
+    text:
+      path: stdout
+      print-linter-name: true
+      print-issued-lines: true
 linters:
   enable:
-    - asciicheck # Simple linter to check that your code does not contain non-ASCII identifiers.
-    - bidichk # Checks for dangerous unicode character sequences.
-    - bodyclose # Checks whether HTTP response body is closed successfully.
-    - contextcheck # Check whether the function uses a non-inherited context.
-    - durationcheck # Check for two durations multiplied together.
-    - errorlint # Used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
-    - funlen # Tool for detection of long functions.
-    - goconst # Finds repeated strings that could be replaced by a constant.
-    - gocritic # Provides diagnostics that check for bugs, performance and style issues.
-    - gocyclo # Computes and checks the cyclomatic complexity of functions.
-    - gofmt # Gofmt checks whether code was gofmt-ed.
-    - goimports # Check import statements are formatted according to the 'goimport' command
-    - gosec # Inspects source code for security problems.
-    - nakedret # Finds naked returns in functions greater than a specified function length.
-    - nestif # Reports deeply nested if statements.
-    - revive # Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in replacement of golint.
-    - unconvert # Remove unnecessary type conversions.
-    - gofumpt # Gofumpt checks whether code was gofumpt-ed.
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - contextcheck
+    - durationcheck
+    - errorlint
+    - funlen
     - gochecknoinits
-
+    - goconst
+    - gocritic
+    - gocyclo
+    - gosec
+    - nakedret
+    - nestif
+    - revive
+    - unconvert
+  settings:
+    dupl:
+      threshold: 100
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+    funlen:
+      lines: 100
+      statements: 50
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - internal/bubbles/table
+      - third_party$
+      - builtin$
+      - examples$
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
-  exclude-dirs:
-    - internal/bubbles/table
+formatters:
+  enable:
+    - gofmt
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - internal/bubbles/table
+      - third_party$
+      - builtin$
+      - examples$

@@ -51,8 +51,6 @@ type Model struct {
 	watchInterval time.Duration
 	logger        *slog.Logger
 
-	err error
-
 	kind       schema.GroupKind
 	pathByData map[string][]string
 }
@@ -232,7 +230,7 @@ func (m Model) traceToRows(v *xplane.Resource, rows *[]navigator.DataRow, depth 
 		row.Color = lipgloss.ANSIColor(ansi.Yellow)
 	}
 
-	data := map[string]string{}
+	var data map[string]string
 	if xplane.IsPkg(m.kind) {
 		resStatus := xplane.GetPkgResourceStatus(v, label)
 		data = map[string]string{

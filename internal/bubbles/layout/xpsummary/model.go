@@ -57,7 +57,7 @@ func (m *Model) SetContent(msg ContentInput) error {
 	return nil
 }
 
-// Helper function to check if a key has a specific suffix
+// Helper function to check if a key has a specific suffix.
 func keyHasSuffix(key, suffix string) bool {
 	if len(key) < len(suffix) {
 		return false

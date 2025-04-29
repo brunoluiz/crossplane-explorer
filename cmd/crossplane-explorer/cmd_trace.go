@@ -31,15 +31,34 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 		Name:    "trace",
 		Aliases: []string{"t"},
 		Flags: []cli.Flag{
-			&cli.StringFlag{Name: "log", Aliases: []string{"l"}, Usage: "Log destination (eg: /tmp/logs.txt", Value: ""},
-			&cli.StringFlag{Name: "dump", Aliases: []string{"du"}, Usage: "Message dump destination (eg: /tmp/dump.txt", Value: ""},
-			&cli.StringFlag{Name: "cmd", Usage: "Which binary should it use to generate the JSON trace", Value: "crossplane beta trace -o json"},
+			&cli.StringFlag{
+				Name:    "log",
+				Aliases: []string{"l"},
+				Usage:   "Log destination (eg: /tmp/logs.txt",
+				Value:   "",
+			},
+			&cli.StringFlag{
+				Name:    "dump",
+				Aliases: []string{"du"},
+				Usage:   "Message dump destination (eg: /tmp/dump.txt",
+				Value:   "",
+			},
+			&cli.StringFlag{
+				Name:  "cmd",
+				Usage: "Which binary should it use to generate the JSON trace",
+				Value: "crossplane beta trace -o json",
+			},
 			&cli.StringFlag{Name: "context", Aliases: []string{"ctx"}, Usage: "Kubernetes context to be used"},
 			&cli.StringFlag{Name: "namespace", Aliases: []string{"n", "ns"}, Usage: "Kubernetes namespace to be used"},
 			&cli.BoolFlag{Name: "stdin", Aliases: []string{"in"}, Usage: "Specify in case file is piped into stdin"},
 			&cli.BoolFlag{Name: "short", Usage: "Return short result columns for small screens"},
 			&cli.BoolFlag{Name: "watch", Aliases: []string{"w"}, Usage: "Refresh trace every 10 seconds"},
-			&cli.DurationFlag{Name: "watch-interval", Aliases: []string{"wi"}, Usage: "Refresh interval for the watcher feature", Value: 5 * time.Second},
+			&cli.DurationFlag{
+				Name:    "watch-interval",
+				Aliases: []string{"wi"},
+				Usage:   "Refresh interval for the watcher feature",
+				Value:   5 * time.Second,
+			},
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
 			logger := slog.New(slog.DiscardHandler)
@@ -52,7 +71,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				logger = slog.New(slog.NewTextHandler(f, &slog.HandlerOptions{}))
 			}
 
-			dumper := func(a ...any) {}
+			dumper := func(...any) {}
 			if c.String("dump") != "" {
 				f, err := os.Create(c.String("dump"))
 				if err != nil {

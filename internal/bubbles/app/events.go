@@ -74,6 +74,7 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 }
 
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
+	//nolint
 	switch {
 	case key.Matches(msg, m.keyMap.Quit):
 		return tea.Interrupt

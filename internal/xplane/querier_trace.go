@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// CLITraceQuerier defines a trace querier using the crossplane CLI
+// CLITraceQuerier defines a trace querier using the crossplane CLI.
 type CLITraceQuerier struct {
 	app  string
 	args []string
@@ -47,7 +47,7 @@ func (q *CLITraceQuerier) GetTrace() (*Resource, error) {
 	return Parse(bytes.NewReader(stdout))
 }
 
-// ReaderTraceQuerier defines a trace querier using piped files through stdin
+// ReaderTraceQuerier defines a trace querier using piped files through stdin.
 type ReaderTraceQuerier struct {
 	r io.Reader
 }

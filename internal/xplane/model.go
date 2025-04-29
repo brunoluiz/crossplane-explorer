@@ -16,7 +16,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
-// Resource resource trace model, extracted from crossplane CLI codebase
+// Resource resource trace model, extracted from crossplane CLI codebase.
 type Resource struct {
 	Unstructured unstructured.Unstructured `json:"object"`
 	Error        *errv1.StatusError        `json:"error,omitempty"`
@@ -210,7 +210,9 @@ func GetPkgResourceStatus(r *Resource, name string) PkgResourceStatus {
 		HealthyLastTransition:   healthyCond.LastTransitionTime.Time,
 		State:                   mapEmptyStatusToDash(corev1.ConditionStatus(state)),
 		Status:                  status,
-		Ok:                      (installedCond.Status == corev1.ConditionTrue && healthyCond.Status == corev1.ConditionTrue) || strings.HasPrefix(status, "Active") || strings.HasPrefix(status, "Healthy"),
+		Ok: (installedCond.Status == corev1.ConditionTrue && healthyCond.Status == corev1.ConditionTrue) ||
+			strings.HasPrefix(status, "Active") ||
+			strings.HasPrefix(status, "Healthy"),
 	}
 }
 

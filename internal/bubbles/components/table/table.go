@@ -209,6 +209,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		return m, nil
 	}
 
+	//nolint
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {

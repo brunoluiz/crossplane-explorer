@@ -31,6 +31,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 }
 
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
+	//nolint
 	switch {
 	case key.Matches(msg, m.KeyMap.Quit):
 		return m.cmdQuit
@@ -53,8 +54,10 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 		m.viewport.Style = m.Styles.Viewport
 		m.viewport.YPosition = headerHeight
 		m.viewport.HighPerformanceRendering = m.useHighPerformanceRenderer
-		m.viewport.KeyMap.PageUp.SetKeys(lo.Flatten([][]string{m.KeyMap.PageUp.Keys(), m.viewport.KeyMap.PageUp.Keys()})...)
-		m.viewport.KeyMap.PageDown.SetKeys(lo.Flatten([][]string{m.KeyMap.PageDown.Keys(), m.viewport.KeyMap.PageDown.Keys()})...)
+		m.viewport.KeyMap.PageUp.SetKeys(
+			lo.Flatten([][]string{m.KeyMap.PageUp.Keys(), m.viewport.KeyMap.PageUp.Keys()})...)
+		m.viewport.KeyMap.PageDown.SetKeys(
+			lo.Flatten([][]string{m.KeyMap.PageDown.Keys(), m.viewport.KeyMap.PageDown.Keys()})...)
 		m.viewport.SetContent(m.content)
 		m.ready = true
 

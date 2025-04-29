@@ -19,7 +19,14 @@ func cmdMain(cmds ...*cli.Command) *cli.Command {
 }
 
 func main() {
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, os.Interrupt)
+	ctx, stop := signal.NotifyContext(
+		context.Background(),
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT,
+		os.Interrupt,
+	)
 	defer stop()
 
 	if err := cmdMain(

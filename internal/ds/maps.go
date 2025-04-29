@@ -1,12 +1,16 @@
 package ds
 
-// WalkMap function that takes a map and a callback function
+// WalkMap function that takes a map and a callback function.
 func WalkMap(m map[string]interface{}, callback func(key string, value interface{}) (interface{}, bool)) {
 	walkMapRecursive(m, callback, "")
 }
 
-// Helper function to walk through the map recursively
-func walkMapRecursive(m map[string]interface{}, callback func(key string, value interface{}) (interface{}, bool), parentKey string) {
+// Helper function to walk through the map recursively.
+func walkMapRecursive(
+	m map[string]interface{},
+	callback func(key string, value interface{}) (interface{}, bool),
+	parentKey string,
+) {
 	for key, value := range m {
 		fullKey := key
 		if parentKey != "" {

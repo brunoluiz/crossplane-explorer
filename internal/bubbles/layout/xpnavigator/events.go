@@ -60,6 +60,6 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 	return tea.Batch(navigatorCmd, statusbarCmd)
 }
 
-func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
+func (m *Model) onKey(_ tea.KeyMsg) tea.Cmd {
 	return nil
 }
