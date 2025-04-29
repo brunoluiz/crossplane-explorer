@@ -8,7 +8,7 @@ import (
 
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/app"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/navigator"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/navigator/statusbar"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/statusbar"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/table"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/xpnavigator"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/xpsummary"

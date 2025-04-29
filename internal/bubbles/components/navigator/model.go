@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/navigator/statusbar"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/statusbar"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/table"
 
 	"github.com/charmbracelet/bubbles/help"
