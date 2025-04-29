@@ -17,6 +17,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/urfave/cli/v3"
 )
 
@@ -31,6 +32,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 		Aliases: []string{"t"},
 		Flags: []cli.Flag{
 			&cli.StringFlag{Name: "log", Aliases: []string{"l"}, Usage: "Log destination (eg: /tmp/logs.txt", Value: ""},
+			&cli.StringFlag{Name: "dump", Aliases: []string{"du"}, Usage: "Message dump destination (eg: /tmp/dump.txt", Value: ""},
 			&cli.StringFlag{Name: "cmd", Usage: "Which binary should it use to generate the JSON trace", Value: "crossplane beta trace -o json"},
 			&cli.StringFlag{Name: "context", Aliases: []string{"ctx"}, Usage: "Kubernetes context to be used"},
 			&cli.StringFlag{Name: "namespace", Aliases: []string{"n", "ns"}, Usage: "Kubernetes namespace to be used"},
@@ -50,27 +52,38 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				logger = slog.New(slog.NewTextHandler(f, &slog.HandlerOptions{}))
 			}
 
-			nav := navigator.New(
-				logger,
-				table.New(
-					table.WithFocused(true),
-					table.WithStyles(func() table.Styles {
-						s := table.DefaultStyles()
-						s.Selected = lipgloss.NewStyle().
-							Foreground(lipgloss.ANSIColor(ansi.Black)).
-							Background(lipgloss.ANSIColor(ansi.White))
-						return s
-					}()),
-				),
-				textinput.New(),
-			)
+			dumper := func(a ...any) {}
+			if c.String("dump") != "" {
+				f, err := os.Create(c.String("dump"))
+				if err != nil {
+					return err
+				}
+
+				dumper = func(a ...any) {
+					spew.Fdump(f, a...)
+				}
+			}
 
 			program := tea.NewProgram(
 				app.New(
 					logger,
+					dumper,
 					xpnavigator.New(
 						logger,
-						nav,
+						navigator.New(
+							logger,
+							table.New(
+								table.WithFocused(true),
+								table.WithStyles(func() table.Styles {
+									s := table.DefaultStyles()
+									s.Selected = lipgloss.NewStyle().
+										Foreground(lipgloss.ANSIColor(ansi.Black)).
+										Background(lipgloss.ANSIColor(ansi.White))
+									return s
+								}()),
+							),
+							textinput.New(),
+						),
 						statusbar.New(),
 						getTracer(c),
 						xpnavigator.WithWatch(c.Bool("watch")),

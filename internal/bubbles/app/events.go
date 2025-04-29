@@ -11,6 +11,8 @@ import (
 )
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	m.dumper("new message", msg)
+
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -20,6 +22,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case *xplane.Resource:
 		m.navigator, cmd = m.navigator.Update(msg)
+		return m, cmd
 	case tea.KeyMsg:
 		cmd = m.onKey(msg)
 	case viewer.EventQuit:
@@ -30,6 +33,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case navigator.EventItemCopied:
 		//nolint // ignore errors
 		clipboard.WriteAll(msg.ID)
+		return m, nil
 	case navigator.EventItemSelected:
 		trace, ok := msg.Data.(*xplane.Resource)
 		if !ok {
@@ -41,6 +45,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		m.pane = PaneViewer
+		return m, nil
 	}
 
 	switch m.pane {
