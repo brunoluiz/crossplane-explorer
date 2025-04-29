@@ -8,17 +8,22 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type EventCopy struct {
+type EventItemCopied struct {
 	ID   string
 	Data any
 }
 
-type EventShow struct {
+type EventItemSelected struct {
 	ID   string
 	Data any
 }
 
-type EventQuit struct{}
+type EventItemFocused struct {
+	ID   string
+	Data any
+}
+
+type EventQuitted struct{}
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
@@ -41,10 +46,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var tableCmd tea.Cmd
 	m.table, tableCmd = m.table.Update(msg)
 
-	var statusBarCmd tea.Cmd
-	m.statusbar, statusBarCmd = m.statusbar.Update(msg)
-
-	return m, tea.Batch(cmd, tableCmd, statusBarCmd)
+	return m, tea.Batch(cmd, tableCmd)
 }
 
 func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
@@ -52,29 +54,31 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 	m.table.SetWidth(msg.Width)
 	m.table.SetHeight(msg.Height)
 	m.SetColumns(m.table.Columns())
-
-	var statusbarCmd tea.Cmd
-	m.statusbar, statusbarCmd = m.statusbar.Update(msg)
-
-	return statusbarCmd
+	return nil
 }
 
-func (m *Model) onNavUp() {
+func (m *Model) onNavUp() tea.Cmd {
 	m.cursor--
 	if m.cursor < 0 {
 		m.cursor = 0
 	}
 	m.doLoadTable()
-	// m.onSelectionChange(m.nodesByCursor[m.cursor])
+
+	return func() tea.Msg {
+		return EventItemFocused{ID: m.Current().ID, Data: m.Current().Data}
+	}
 }
 
-func (m *Model) onNavDown() {
+func (m *Model) onNavDown() tea.Cmd {
 	m.cursor++
 	if m.cursor >= len(m.data) {
 		m.cursor = len(m.data) - 1
 	}
 	m.doLoadTable()
-	// m.onSelectionChange(m.nodesByCursor[m.cursor])
+
+	return func() tea.Msg {
+		return EventItemFocused{ID: m.Current().ID, Data: m.Current().Data}
+	}
 }
 
 func (m *Model) onSearch(msg tea.KeyMsg) tea.Cmd {
@@ -129,30 +133,38 @@ func (m *Model) onSearchQuit() {
 	m.doLoadTable()
 }
 
-func (m *Model) onSearchNext() {
+func (m *Model) onSearchNext() tea.Cmd {
 	if len(m.searchResultPos) == 0 {
-		return
+		return nil
 	}
 
 	m.searchCursor++
 	if m.searchCursor >= len(m.searchResultPos) {
 		m.searchCursor = 0 // Wrap around to the first result
 	}
+
 	m.cursor = m.searchResultPos[m.searchCursor]
 	m.table.SetCursor(m.cursor)
+	return func() tea.Msg {
+		return EventItemFocused{ID: m.Current().ID, Data: m.Current().Data}
+	}
 }
 
-func (m *Model) onSearchPrev() {
+func (m *Model) onSearchPrev() tea.Cmd {
 	if len(m.searchResultPos) == 0 {
-		return
+		return nil
 	}
 
 	m.searchCursor--
 	if m.searchCursor < 0 {
 		m.searchCursor = len(m.searchResultPos) - 1 // Wrap around to the last result
 	}
+
 	m.cursor = m.searchResultPos[m.searchCursor]
 	m.table.SetCursor(m.cursor)
+	return func() tea.Msg {
+		return EventItemFocused{ID: m.Current().ID, Data: m.Current().Data}
+	}
 }
 
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
@@ -164,30 +176,30 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	case key.Matches(msg, m.KeyMap.Search):
 		m.onSearchInit()
 	case key.Matches(msg, m.KeyMap.Up):
-		m.onNavUp()
+		return m.onNavUp()
 	case key.Matches(msg, m.KeyMap.Down):
-		m.onNavDown()
+		return m.onNavDown()
 	case key.Matches(msg, m.KeyMap.Help):
 		m.showHelp = !m.showHelp
 		// m.Help.ShowAll = !m.Help.ShowAll
 	case key.Matches(msg, m.KeyMap.Copy):
 		return func() tea.Msg {
-			return EventCopy{ID: m.Current().ID, Data: m.Current().Data}
+			return EventItemCopied{ID: m.Current().ID, Data: m.Current().Data}
 		}
 	case key.Matches(msg, m.KeyMap.SearchQuit):
 		m.onSearchQuit()
 	case key.Matches(msg, m.KeyMap.Show):
 		return func() tea.Msg {
-			return EventShow{ID: m.Current().ID, Data: m.Current().Data}
+			return EventItemSelected{ID: m.Current().ID, Data: m.Current().Data}
 		}
 	case key.Matches(msg, m.KeyMap.Quit):
 		return func() tea.Msg {
-			return EventQuit{}
+			return EventQuitted{}
 		}
 	case key.Matches(msg, m.KeyMap.SearchNext):
-		m.onSearchNext()
+		return m.onSearchNext()
 	case key.Matches(msg, m.KeyMap.SearchPrevious):
-		m.onSearchPrev()
+		return m.onSearchPrev()
 	}
 	return nil
 }

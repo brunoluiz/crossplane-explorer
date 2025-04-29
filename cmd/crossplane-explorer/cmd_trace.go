@@ -6,11 +6,12 @@ import (
 	"os"
 	"time"
 
-	explorer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/app"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/viewer"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator/statusbar"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/table"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/app"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/navigator"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/statusbar"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/table"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/xpnavigator"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/xpsummary"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -49,41 +50,46 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				logger = slog.New(slog.NewTextHandler(f, &slog.HandlerOptions{}))
 			}
 
-			app := tea.NewProgram(
-				explorer.New(
+			nav := navigator.New(
+				logger,
+				table.New(
+					table.WithFocused(true),
+					table.WithStyles(func() table.Styles {
+						s := table.DefaultStyles()
+						s.Selected = lipgloss.NewStyle().
+							Foreground(lipgloss.ANSIColor(ansi.Black)).
+							Background(lipgloss.ANSIColor(ansi.White))
+						return s
+					}()),
+				),
+				textinput.New(),
+			)
+
+			program := tea.NewProgram(
+				app.New(
 					logger,
-					navigator.New(
+					xpnavigator.New(
 						logger,
-						table.New(
-							table.WithFocused(true),
-							table.WithStyles(func() table.Styles {
-								s := table.DefaultStyles()
-								s.Selected = lipgloss.NewStyle().
-									Foreground(lipgloss.ANSIColor(ansi.Black)).
-									Background(lipgloss.ANSIColor(ansi.White))
-								return s
-							}()),
-						),
-						textinput.New(),
+						nav,
 						statusbar.New(),
+						getTracer(c),
+						xpnavigator.WithWatch(c.Bool("watch")),
+						xpnavigator.WithWatchInterval(c.Duration("watch-interval")),
+						xpnavigator.WithShortColumns(c.Bool("short")),
 					),
-					viewer.New(),
-					getTracer(c),
-					explorer.WithWatch(c.Bool("watch")),
-					explorer.WithWatchInterval(c.Duration("watch-interval")),
-					explorer.WithShortColumns(c.Bool("short")),
+					xpsummary.New(),
 				),
 				tea.WithAltScreen(),
 				tea.WithContext(ctx),
 			)
 
-			_, err := app.Run()
+			_, err := program.Run()
 			return err
 		},
 	}
 }
 
-func getTracer(c *cli.Command) explorer.Tracer {
+func getTracer(c *cli.Command) xpnavigator.Tracer {
 	if c.Bool("stdin") {
 		return xplane.NewReaderTraceQuerier(os.Stdin)
 	}

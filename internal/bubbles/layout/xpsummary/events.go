@@ -1,4 +1,4 @@
-package viewer
+package xpsummary
 
 import (
 	tea "github.com/charmbracelet/bubbletea"

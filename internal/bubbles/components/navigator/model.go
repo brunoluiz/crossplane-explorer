@@ -6,8 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator/statusbar"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/table"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/table"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -50,7 +49,6 @@ type Model struct {
 	Help        help.Model
 	table       table.Model
 	searchInput textinput.Model
-	statusbar   statusbar.Model
 	logger      *slog.Logger
 
 	width  int
@@ -70,7 +68,6 @@ func New(
 	logger *slog.Logger,
 	tableModel table.Model,
 	searchInputModel textinput.Model,
-	statusBarModel statusbar.Model,
 ) Model {
 	searchInputModel.Prompt = "🔍 "
 	searchInputModel.Placeholder = "Search..."
@@ -78,7 +75,6 @@ func New(
 		logger:      logger,
 		table:       tableModel,
 		searchInput: searchInputModel,
-		statusbar:   statusBarModel,
 		KeyMap:      DefaultKeyMap(),
 		Styles:      DefaultStyles(),
 
@@ -120,7 +116,6 @@ func (m Model) View() string {
 		components = append(components, filterBar)
 	}
 
-	components = append(components, m.statusbar.View())
 	m.table.SetHeight(availableHeight)
 	tree := m.table.View()
 
