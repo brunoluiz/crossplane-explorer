@@ -1,4 +1,4 @@
-package explorer
+package app
 
 import (
 	"fmt"

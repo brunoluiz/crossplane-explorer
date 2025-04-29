@@ -1,4 +1,4 @@
-package explorer
+package app
 
 import (
 	"github.com/atotto/clipboard"

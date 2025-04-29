@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	explorer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/app"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/app"
 	navigatorpane "github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/navigator"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/viewer"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator"
@@ -66,8 +66,8 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				statusbar.New(),
 			)
 
-			app := tea.NewProgram(
-				explorer.New(
+			program := tea.NewProgram(
+				app.New(
 					logger,
 					navigatorpane.New(
 						logger,
@@ -83,7 +83,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				tea.WithContext(ctx),
 			)
 
-			_, err := app.Run()
+			_, err := program.Run()
 			return err
 		},
 	}
