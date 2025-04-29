@@ -11,7 +11,6 @@ func DefaultKeyMap() KeyMap {
 	return KeyMap{
 		Quit: key.NewBinding(
 			key.WithKeys("ctrl+c", "ctrl+d"),
-			key.WithHelp("q/esc", "quit"),
 		),
 	}
 }
