@@ -79,8 +79,8 @@ func New(
 	treeModel navigator.Model,
 	tracer Tracer,
 	opts ...WithOpt,
-) *Model {
-	m := &Model{
+) Model {
+	m := Model{
 		keyMap:        DefaultKeyMap(),
 		logger:        logger,
 		navigator:     treeModel,
@@ -92,7 +92,7 @@ func New(
 	}
 
 	for _, opt := range opts {
-		opt(m)
+		opt(&m)
 	}
 
 	return m

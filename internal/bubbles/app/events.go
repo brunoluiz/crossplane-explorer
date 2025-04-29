@@ -1,8 +1,6 @@
 package explorer
 
 import (
-	"time"
-
 	"github.com/atotto/clipboard"
 	xviewer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/viewer"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator"
@@ -20,13 +18,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.setIrrecoverableError(msg)
 		return m, nil
 	case *xplane.Resource:
-		cmd = m.onLoad(msg)
+		m.navigator, cmd = m.navigator.Update(msg)
 	case tea.WindowSizeMsg:
 		return m, m.onResize(msg)
 	case tea.KeyMsg:
 		cmd = m.onKey(msg)
 	case viewer.EventQuit:
-		m.pane = PaneTree
+		m.pane = PaneNavigator
 		return m, nil
 	case navigator.EventQuit:
 		return m, tea.Interrupt
@@ -43,40 +41,24 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.setIrrecoverableError(err)
 			return m, nil
 		}
-		m.pane = PaneSummary
+		m.pane = PaneViewer
 	}
 
 	switch m.pane {
-	case PaneSummary:
+	case PaneViewer:
 		var viewerCmd tea.Cmd
 		m.viewer, viewerCmd = m.viewer.Update(msg)
 		return m, tea.Batch(cmd, viewerCmd)
-	case PaneTree:
-		var treeCmd, statusCmd tea.Cmd
-		m.navigator, treeCmd = m.navigator.Update(msg)
+	case PaneNavigator:
+		var navigatorCmd, statusCmd tea.Cmd
+		m.navigator, navigatorCmd = m.navigator.Update(msg)
 
-		return m, tea.Batch(cmd, statusCmd, treeCmd)
+		return m, tea.Batch(cmd, statusCmd, navigatorCmd)
 	case PaneIrrecoverableError:
 		return m, cmd
 	}
 
 	return m, cmd
-}
-
-func (m *Model) onLoad(data *xplane.Resource) tea.Cmd {
-	if data == nil {
-		return nil
-	}
-
-	m.setColumns(data.Unstructured.GroupVersionKind().GroupKind())
-	m.setNodes(data)
-
-	if m.watch {
-		return tea.Tick(m.watchInterval, func(_ time.Time) tea.Msg {
-			return m.getTrace()()
-		})
-	}
-	return nil
 }
 
 func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {

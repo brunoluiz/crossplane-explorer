@@ -7,6 +7,7 @@ import (
 	"time"
 
 	explorer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/app"
+	navigatorpane "github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/navigator"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/viewer"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator/statusbar"
@@ -49,29 +50,34 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				logger = slog.New(slog.NewTextHandler(f, &slog.HandlerOptions{}))
 			}
 
+			nav := navigator.New(
+				logger,
+				table.New(
+					table.WithFocused(true),
+					table.WithStyles(func() table.Styles {
+						s := table.DefaultStyles()
+						s.Selected = lipgloss.NewStyle().
+							Foreground(lipgloss.ANSIColor(ansi.Black)).
+							Background(lipgloss.ANSIColor(ansi.White))
+						return s
+					}()),
+				),
+				textinput.New(),
+				statusbar.New(),
+			)
+
 			app := tea.NewProgram(
 				explorer.New(
 					logger,
-					navigator.New(
+					navigatorpane.New(
 						logger,
-						table.New(
-							table.WithFocused(true),
-							table.WithStyles(func() table.Styles {
-								s := table.DefaultStyles()
-								s.Selected = lipgloss.NewStyle().
-									Foreground(lipgloss.ANSIColor(ansi.Black)).
-									Background(lipgloss.ANSIColor(ansi.White))
-								return s
-							}()),
-						),
-						textinput.New(),
-						statusbar.New(),
+						nav,
+						getTracer(c),
+						navigatorpane.WithWatch(c.Bool("watch")),
+						navigatorpane.WithWatchInterval(c.Duration("watch-interval")),
+						navigatorpane.WithShortColumns(c.Bool("short")),
 					),
 					viewer.New(),
-					getTracer(c),
-					explorer.WithWatch(c.Bool("watch")),
-					explorer.WithWatchInterval(c.Duration("watch-interval")),
-					explorer.WithShortColumns(c.Bool("short")),
 				),
 				tea.WithAltScreen(),
 				tea.WithContext(ctx),
@@ -83,7 +89,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 	}
 }
 
-func getTracer(c *cli.Command) explorer.Tracer {
+func getTracer(c *cli.Command) navigatorpane.Tracer {
 	if c.Bool("stdin") {
 		return xplane.NewReaderTraceQuerier(os.Stdin)
 	}

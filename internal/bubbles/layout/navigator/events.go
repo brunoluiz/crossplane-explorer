@@ -8,7 +8,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case *xplane.Resource:
@@ -19,7 +19,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmd = m.onKey(msg)
 	}
 
-	return m, cmd
+	var navigatorCmd tea.Cmd
+	m.navigator, navigatorCmd = m.navigator.Update(msg)
+
+	return m, tea.Batch(cmd, navigatorCmd)
 }
 
 func (m *Model) onCrossplaneUpdate(data *xplane.Resource) tea.Cmd {
@@ -28,7 +31,7 @@ func (m *Model) onCrossplaneUpdate(data *xplane.Resource) tea.Cmd {
 	}
 
 	m.setColumns(data.Unstructured.GroupVersionKind().GroupKind())
-	m.setNodes(data)
+	m.setData(data)
 
 	if m.watch {
 		return tea.Tick(m.watchInterval, func(_ time.Time) tea.Msg {
