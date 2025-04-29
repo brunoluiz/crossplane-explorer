@@ -138,6 +138,10 @@ func (m *Model) onSearchNext() tea.Cmd {
 		return nil
 	}
 
+	if m.searchCursor <= m.cursor {
+		m.searchCursor = m.cursor
+	}
+
 	m.searchCursor++
 	if m.searchCursor >= len(m.searchResultPos) {
 		m.searchCursor = 0 // Wrap around to the first result
@@ -153,6 +157,10 @@ func (m *Model) onSearchNext() tea.Cmd {
 func (m *Model) onSearchPrev() tea.Cmd {
 	if len(m.searchResultPos) == 0 {
 		return nil
+	}
+
+	if m.cursor <= m.searchCursor {
+		m.searchCursor = m.cursor
 	}
 
 	m.searchCursor--
