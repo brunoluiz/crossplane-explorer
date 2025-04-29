@@ -54,7 +54,7 @@ type Model struct {
 	err error
 
 	kind       schema.GroupKind
-	pathByData map[*xplane.Resource]string
+	pathByData map[string][]string
 }
 
 type WithOpt func(*Model)
@@ -94,7 +94,7 @@ func New(
 		height:        0,
 		watchInterval: 10 * time.Second,
 		short:         true,
-		pathByData:    map[*xplane.Resource]string{},
+		pathByData:    map[string][]string{},
 	}
 
 	for _, opt := range opts {
@@ -206,14 +206,14 @@ func (m *Model) setColumns(gk schema.GroupKind) {
 func (m *Model) setData(data *xplane.Resource) {
 	rows := []navigator.DataRow{}
 	m.kind = data.Unstructured.GroupVersionKind().GroupKind()
-	m.traceToRows(data, &rows, 0)
+	m.traceToRows(data, &rows, 0, []string{})
 	m.navigator.SetData(rows)
 }
 
-func (m Model) traceToRows(v *xplane.Resource, rows *[]navigator.DataRow, depth int) {
+func (m Model) traceToRows(v *xplane.Resource, rows *[]navigator.DataRow, depth int, currentPath []string) {
 	const treeNodePrefix string = " └─"
 
-	label := fmt.Sprintf("%s/%s", v.Unstructured.GetKind(), v.Unstructured.GetName())
+	name := fmt.Sprintf("%s/%s", v.Unstructured.GetKind(), v.Unstructured.GetName())
 	group := v.Unstructured.GetObjectKind().GroupVersionKind().Group
 	row := navigator.DataRow{
 		ID:      fmt.Sprintf("%s.%s/%s", v.Unstructured.GetKind(), group, v.Unstructured.GetName()),
@@ -221,6 +221,7 @@ func (m Model) traceToRows(v *xplane.Resource, rows *[]navigator.DataRow, depth 
 		Columns: []string{},
 	}
 
+	label := name
 	if depth > 0 {
 		shape := strings.Repeat(" ", (depth-1)) + treeNodePrefix + " "
 		label = shape + label
@@ -269,8 +270,14 @@ func (m Model) traceToRows(v *xplane.Resource, rows *[]navigator.DataRow, depth 
 	}
 	*rows = append(*rows, row)
 
+	// Index current path
+	path := make([]string, len(currentPath))
+	copy(path, currentPath)
+	path = append(path, name)
+	m.pathByData[row.ID] = path
+
 	for _, cv := range v.Children {
-		m.traceToRows(cv, rows, depth+1)
+		m.traceToRows(cv, rows, depth+1, path)
 	}
 }
 

@@ -19,7 +19,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	case tea.KeyMsg:
 		cmd = m.onKey(msg)
 	case navigator.EventFocused:
-		m.statusbar.SetPath([]string{msg.ID})
+		m.statusbar.SetPath(m.pathByData[msg.ID])
 	}
 
 	var navigatorCmd tea.Cmd
