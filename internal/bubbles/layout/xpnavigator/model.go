@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/navigator"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/statusbar"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/table"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	tea "github.com/charmbracelet/bubbletea"
@@ -41,6 +42,7 @@ type Tracer interface {
 type Model struct {
 	keyMap        KeyMap
 	navigator     navigator.Model
+	statusbar     statusbar.Model
 	tracer        Tracer
 	width         int
 	height        int
@@ -77,14 +79,16 @@ func WithShortColumns(enabled bool) func(*Model) {
 
 func New(
 	logger *slog.Logger,
-	treeModel navigator.Model,
+	navModel navigator.Model,
+	statusModel statusbar.Model,
 	tracer Tracer,
 	opts ...WithOpt,
 ) Model {
 	m := Model{
 		keyMap:        DefaultKeyMap(),
 		logger:        logger,
-		navigator:     treeModel,
+		navigator:     navModel,
+		statusbar:     statusModel,
 		tracer:        tracer,
 		width:         0,
 		height:        0,
@@ -118,6 +122,7 @@ func (m Model) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		m.navigator.View(),
+		m.statusbar.View(),
 	)
 }
 

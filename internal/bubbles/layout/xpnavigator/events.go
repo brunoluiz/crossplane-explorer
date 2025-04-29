@@ -3,6 +3,7 @@ package xpnavigator
 import (
 	"time"
 
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/navigator"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -17,12 +18,17 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		return m, m.onResize(msg)
 	case tea.KeyMsg:
 		cmd = m.onKey(msg)
+	case navigator.EventFocused:
+		m.statusbar.SetPath([]string{msg.ID})
 	}
 
 	var navigatorCmd tea.Cmd
 	m.navigator, navigatorCmd = m.navigator.Update(msg)
 
-	return m, tea.Batch(cmd, navigatorCmd)
+	var statusBarCmd tea.Cmd
+	m.statusbar, statusBarCmd = m.statusbar.Update(msg)
+
+	return m, tea.Batch(cmd, navigatorCmd, statusBarCmd)
 }
 
 func (m *Model) onCrossplaneUpdate(data *xplane.Resource) tea.Cmd {
@@ -42,13 +48,16 @@ func (m *Model) onCrossplaneUpdate(data *xplane.Resource) tea.Cmd {
 }
 
 func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
+	var navigatorCmd, statusbarCmd tea.Cmd
 	m.width = msg.Width
 	m.height = msg.Height
 
 	top, _, _, _ := lipgloss.NewStyle().Padding(1).GetPadding()
-	m.navigator, _ = m.navigator.Update(tea.WindowSizeMsg{Width: m.width, Height: m.height - top})
+	m.navigator, navigatorCmd = m.navigator.Update(tea.WindowSizeMsg{Width: m.width, Height: m.height - top})
 
-	return nil
+	m.statusbar, statusbarCmd = m.statusbar.Update(msg)
+
+	return tea.Batch(navigatorCmd, statusbarCmd)
 }
 
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {

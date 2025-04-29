@@ -63,7 +63,6 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 					}()),
 				),
 				textinput.New(),
-				statusbar.New(),
 			)
 
 			program := tea.NewProgram(
@@ -72,6 +71,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 					xpnavigator.New(
 						logger,
 						nav,
+						statusbar.New(),
 						getTracer(c),
 						xpnavigator.WithWatch(c.Bool("watch")),
 						xpnavigator.WithWatchInterval(c.Duration("watch-interval")),
