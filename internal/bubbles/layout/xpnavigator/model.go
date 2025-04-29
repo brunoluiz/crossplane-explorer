@@ -51,7 +51,8 @@ type Model struct {
 
 	err error
 
-	kind schema.GroupKind
+	kind       schema.GroupKind
+	pathByData map[*xplane.Resource]string
 }
 
 type WithOpt func(*Model)
@@ -89,6 +90,7 @@ func New(
 		height:        0,
 		watchInterval: 10 * time.Second,
 		short:         true,
+		pathByData:    map[*xplane.Resource]string{},
 	}
 
 	for _, opt := range opts {
