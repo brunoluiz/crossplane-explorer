@@ -1,4 +1,4 @@
-package viewer
+package xpsummary
 
 import (
 	"github.com/charmbracelet/lipgloss"

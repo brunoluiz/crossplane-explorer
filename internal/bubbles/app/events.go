@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/atotto/clipboard"
-	xviewer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/viewer"
+	xviewer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/xpsummary"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/viewer"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"

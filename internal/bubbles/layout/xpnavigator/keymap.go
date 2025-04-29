@@ -1,4 +1,4 @@
-package navigator
+package xpnavigator
 
 type KeyMap struct{}
 

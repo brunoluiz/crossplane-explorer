@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/app"
-	navigatorpane "github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/navigator"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/viewer"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/xpnavigator"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/xpsummary"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator/statusbar"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/table"
@@ -69,15 +69,15 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 			program := tea.NewProgram(
 				app.New(
 					logger,
-					navigatorpane.New(
+					xpnavigator.New(
 						logger,
 						nav,
 						getTracer(c),
-						navigatorpane.WithWatch(c.Bool("watch")),
-						navigatorpane.WithWatchInterval(c.Duration("watch-interval")),
-						navigatorpane.WithShortColumns(c.Bool("short")),
+						xpnavigator.WithWatch(c.Bool("watch")),
+						xpnavigator.WithWatchInterval(c.Duration("watch-interval")),
+						xpnavigator.WithShortColumns(c.Bool("short")),
 					),
-					viewer.New(),
+					xpsummary.New(),
 				),
 				tea.WithAltScreen(),
 				tea.WithContext(ctx),
@@ -89,7 +89,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 	}
 }
 
-func getTracer(c *cli.Command) navigatorpane.Tracer {
+func getTracer(c *cli.Command) xpnavigator.Tracer {
 	if c.Bool("stdin") {
 		return xplane.NewReaderTraceQuerier(os.Stdin)
 	}
