@@ -22,8 +22,6 @@ type Model struct {
 	keyMap    KeyMap
 	viewer    viewerpane.Model
 	navigator navigatorpane.Model
-	width     int
-	height    int
 	logger    *slog.Logger
 
 	pane Pane
@@ -43,8 +41,6 @@ func New(
 		logger:    logger,
 		navigator: navigatorModel,
 		viewer:    viewerModel,
-		width:     0,
-		height:    0,
 		pane:      PaneNavigator,
 	}
 

@@ -45,8 +45,8 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 	m.width = msg.Width
 	m.height = msg.Height
 
-	top, right, _, left := lipgloss.NewStyle().Padding(1).GetPadding()
-	m.navigator, _ = m.navigator.Update(tea.WindowSizeMsg{Width: m.width - right - left, Height: m.height - top})
+	top, _, _, _ := lipgloss.NewStyle().Padding(1).GetPadding()
+	m.navigator, _ = m.navigator.Update(tea.WindowSizeMsg{Width: m.width, Height: m.height - top})
 
 	return nil
 }

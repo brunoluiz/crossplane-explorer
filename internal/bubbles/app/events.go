@@ -8,19 +8,18 @@ import (
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		return m, m.onResize(msg)
 	case error:
 		m.setIrrecoverableError(msg)
 		return m, nil
 	case *xplane.Resource:
 		m.navigator, cmd = m.navigator.Update(msg)
-	case tea.WindowSizeMsg:
-		return m, m.onResize(msg)
 	case tea.KeyMsg:
 		cmd = m.onKey(msg)
 	case viewer.EventQuit:
@@ -62,14 +61,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
-	m.width = msg.Width
-	m.height = msg.Height
+	var navigatorCmd, viewerCmd tea.Cmd
+	m.navigator, navigatorCmd = m.navigator.Update(msg)
+	m.viewer, viewerCmd = m.viewer.Update(msg)
 
-	top, right, _, left := lipgloss.NewStyle().Padding(1).GetPadding()
-	m.navigator, _ = m.navigator.Update(tea.WindowSizeMsg{Width: m.width - right - left, Height: m.height - top})
-	m.viewer, _ = m.viewer.Update(msg)
-
-	return nil
+	return tea.Batch(navigatorCmd, viewerCmd)
 }
 
 func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
