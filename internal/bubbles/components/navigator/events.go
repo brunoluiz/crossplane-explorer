@@ -8,22 +8,22 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type EventCopy struct {
+type EventItemCopied struct {
 	ID   string
 	Data any
 }
 
-type EventShow struct {
+type EventItemSelected struct {
 	ID   string
 	Data any
 }
 
-type EventFocused struct {
+type EventItemFocused struct {
 	ID   string
 	Data any
 }
 
-type EventQuit struct{}
+type EventQuitted struct{}
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
@@ -65,7 +65,7 @@ func (m *Model) onNavUp() tea.Cmd {
 	m.doLoadTable()
 
 	return func() tea.Msg {
-		return EventFocused{ID: m.Current().ID, Data: m.Current().Data}
+		return EventItemFocused{ID: m.Current().ID, Data: m.Current().Data}
 	}
 }
 
@@ -77,7 +77,7 @@ func (m *Model) onNavDown() tea.Cmd {
 	m.doLoadTable()
 
 	return func() tea.Msg {
-		return EventFocused{ID: m.Current().ID, Data: m.Current().Data}
+		return EventItemFocused{ID: m.Current().ID, Data: m.Current().Data}
 	}
 }
 
@@ -149,7 +149,7 @@ func (m *Model) updateCursor(cursor int) tea.Cmd {
 	m.cursor = cursor
 	m.table.SetCursor(m.cursor)
 	return func() tea.Msg {
-		return EventFocused{ID: m.Current().ID, Data: m.Current().Data}
+		return EventItemFocused{ID: m.Current().ID, Data: m.Current().Data}
 	}
 }
 
@@ -182,17 +182,17 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 		// m.Help.ShowAll = !m.Help.ShowAll
 	case key.Matches(msg, m.KeyMap.Copy):
 		return func() tea.Msg {
-			return EventCopy{ID: m.Current().ID, Data: m.Current().Data}
+			return EventItemCopied{ID: m.Current().ID, Data: m.Current().Data}
 		}
 	case key.Matches(msg, m.KeyMap.SearchQuit):
 		m.onSearchQuit()
 	case key.Matches(msg, m.KeyMap.Show):
 		return func() tea.Msg {
-			return EventShow{ID: m.Current().ID, Data: m.Current().Data}
+			return EventItemSelected{ID: m.Current().ID, Data: m.Current().Data}
 		}
 	case key.Matches(msg, m.KeyMap.Quit):
 		return func() tea.Msg {
-			return EventQuit{}
+			return EventQuitted{}
 		}
 	case key.Matches(msg, m.KeyMap.SearchNext):
 		return m.onSearchNext()

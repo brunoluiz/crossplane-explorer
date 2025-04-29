@@ -25,12 +25,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case viewer.EventQuit:
 		m.pane = PaneNavigator
 		return m, nil
-	case navigator.EventQuit:
+	case navigator.EventQuitted:
 		return m, tea.Interrupt
-	case navigator.EventCopy:
+	case navigator.EventItemCopied:
 		//nolint // ignore errors
 		clipboard.WriteAll(msg.ID)
-	case navigator.EventShow:
+	case navigator.EventItemSelected:
 		trace, ok := msg.Data.(*xplane.Resource)
 		if !ok {
 			return m, nil
