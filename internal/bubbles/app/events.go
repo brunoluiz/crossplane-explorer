@@ -11,7 +11,7 @@ import (
 )
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	m.dumper("app.Msg", msg)
+	m.dumper("new message", msg)
 
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
@@ -22,6 +22,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case *xplane.Resource:
 		m.navigator, cmd = m.navigator.Update(msg)
+		return m, cmd
 	case tea.KeyMsg:
 		cmd = m.onKey(msg)
 	case viewer.EventQuit:
