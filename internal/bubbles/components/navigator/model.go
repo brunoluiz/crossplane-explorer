@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator/statusbar"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/table"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/navigator/statusbar"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/table"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"

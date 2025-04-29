@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/navigator"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/shared/table"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/navigator"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/components/table"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
