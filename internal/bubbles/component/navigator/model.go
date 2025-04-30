@@ -55,11 +55,12 @@ type Model struct {
 	height int
 	cursor int
 
-	showHelp        bool
-	searchMode      searchMode
-	searchResult    string
-	searchCursor    int
-	searchResultPos []int
+	showHelp             bool
+	searchMode           searchMode
+	searchResult         string
+	searchCursor         int
+	cursorBySearchCursor map[int]int
+	searchCursorByCursor map[int]int
 
 	data []DataRow
 }
@@ -84,8 +85,9 @@ func New(
 		showHelp: true,
 		Help:     help.New(),
 
-		searchCursor:    0,
-		searchResultPos: []int{},
+		searchCursor:         0,
+		cursorBySearchCursor: map[int]int{},
+		searchCursorByCursor: map[int]int{},
 	}
 }
 

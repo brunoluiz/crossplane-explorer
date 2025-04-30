@@ -100,15 +100,21 @@ func (m *Model) onSearch(msg tea.KeyMsg) tea.Cmd {
 
 func (m *Model) doSearch() {
 	searchTerm := strings.ToLower(m.searchInput.Value())
-	m.searchResultPos = []int{}
-	for i, v := range m.data {
+	m.cursorBySearchCursor = map[int]int{}
+	m.searchCursorByCursor = map[int]int{}
+
+	match := 0
+	for pos, v := range m.data {
 		if strings.Contains(strings.ToLower(v.ID), searchTerm) {
-			m.searchResultPos = append(m.searchResultPos, i)
+			m.cursorBySearchCursor[match] = pos
+			m.searchCursorByCursor[pos] = match
+			match++
 		}
 	}
-	if len(m.searchResultPos) > 0 {
+
+	if len(m.cursorBySearchCursor) > 0 {
 		m.searchCursor = 0
-		m.cursor = m.searchResultPos[0]
+		m.cursor = m.cursorBySearchCursor[0]
 		m.table.SetCursor(m.cursor)
 	}
 }
@@ -129,25 +135,37 @@ func (m *Model) onSearchQuit() {
 	m.searchMode = searchModeOff
 	m.searchResult = ""
 	m.searchCursor = 0
-	m.searchResultPos = []int{}
+	m.cursorBySearchCursor = map[int]int{}
+	m.searchCursorByCursor = map[int]int{}
 	m.doLoadTable()
 }
 
 func (m *Model) onSearchNext() tea.Cmd {
-	if len(m.searchResultPos) == 0 {
+	if len(m.cursorBySearchCursor) == 0 {
 		return nil
 	}
 
-	if m.searchCursor <= m.cursor {
-		m.searchCursor = m.cursor
+	// Behaviour within boundaries of search highlighted range
+	// If m.cursor is within the highlighted range, resets the position to the cursor itself.
+	// This will be the point of reference to be used.
+	if m.cursorBySearchCursor[0] <= m.cursor && m.cursor <= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1] {
+		m.searchCursor = m.searchCursorByCursor[m.cursor]
+		m.searchCursor++
+		// Behaviour for out of left boundary
+	} else if m.cursor < m.cursorBySearchCursor[0] {
+		m.searchCursor = 0
+		// Behaviour for out of right boundary
+	} else if m.cursor >= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1] {
+		m.searchCursor = 0
+	} else {
+		m.searchCursor++
 	}
 
-	m.searchCursor++
-	if m.searchCursor >= len(m.searchResultPos) {
+	if m.searchCursor >= len(m.cursorBySearchCursor) {
 		m.searchCursor = 0 // Wrap around to the first result
 	}
 
-	m.cursor = m.searchResultPos[m.searchCursor]
+	m.cursor = m.cursorBySearchCursor[m.searchCursor]
 	m.table.SetCursor(m.cursor)
 	return func() tea.Msg {
 		return EventItemFocused{ID: m.Current().ID, Data: m.Current().Data}
@@ -155,20 +173,31 @@ func (m *Model) onSearchNext() tea.Cmd {
 }
 
 func (m *Model) onSearchPrev() tea.Cmd {
-	if len(m.searchResultPos) == 0 {
+	if len(m.cursorBySearchCursor) == 0 {
 		return nil
 	}
 
-	if m.cursor <= m.searchCursor {
-		m.searchCursor = m.cursor
+	// Behaviour within boundaries of search highlighted range
+	// If m.cursor is within the highlighted range, resets the position to the cursor itself.
+	// This will be the point of reference to be used.
+	if m.cursorBySearchCursor[0] <= m.cursor && m.cursor <= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1] {
+		m.searchCursor = m.searchCursorByCursor[m.cursor]
+		m.searchCursor--
+		// Behaviour for out of left boundary
+	} else if m.cursor < m.cursorBySearchCursor[0] {
+		m.searchCursor = 0
+		// Behaviour for out of right boundary
+	} else if m.cursor >= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1] {
+		m.searchCursor = len(m.cursorBySearchCursor) - 1
+	} else {
+		m.searchCursor--
 	}
 
-	m.searchCursor--
 	if m.searchCursor < 0 {
-		m.searchCursor = len(m.searchResultPos) - 1 // Wrap around to the last result
+		m.searchCursor = len(m.cursorBySearchCursor) - 1 // Wrap around to the last result
 	}
 
-	m.cursor = m.searchResultPos[m.searchCursor]
+	m.cursor = m.cursorBySearchCursor[m.searchCursor]
 	m.table.SetCursor(m.cursor)
 	return func() tea.Msg {
 		return EventItemFocused{ID: m.Current().ID, Data: m.Current().Data}
