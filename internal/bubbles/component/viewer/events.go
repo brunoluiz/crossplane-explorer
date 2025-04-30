@@ -1,6 +1,8 @@
 package viewer
 
 import (
+	"strings"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -23,6 +25,15 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		cmds = append(cmds, m.onResize(msg))
 	}
 
+	switch m.searchMode {
+	case searchModeInput:
+		var searchCmd tea.Cmd
+		m.searchInput, searchCmd = m.searchInput.Update(msg)
+		cmds = append(cmds, searchCmd)
+	case searchModeInit:
+		m.searchMode = searchModeInput
+	}
+
 	// Handle keyboard and mouse events in the viewport
 	m.viewport, cmd = m.viewport.Update(msg)
 	cmds = append(cmds, cmd)
@@ -34,7 +45,18 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	//nolint
 	switch {
 	case key.Matches(msg, m.KeyMap.Quit):
+		defer m.onSearchQuit()
+		if key.Matches(msg, m.KeyMap.SearchQuit) && m.searchMode != searchModeOff {
+			return nil
+		}
+
 		return m.cmdQuit
+	case key.Matches(msg, m.KeyMap.Search):
+		m.onSearchInit()
+	case key.Matches(msg, m.KeyMap.SearchConfirm):
+		m.onSearchConfirm()
+	case key.Matches(msg, m.KeyMap.SearchQuit):
+		m.onSearchQuit()
 	}
 	return nil
 }
@@ -80,4 +102,65 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 	}
 
 	return nil
+}
+
+func (m *Model) onSearchInit() {
+	m.searchMode = searchModeInit
+	m.searchInput.Focus()
+}
+
+func (m *Model) onSearchConfirm() {
+	m.searchResult = m.searchInput.Value()
+	m.searchInput.Blur()
+	m.searchMode = searchModeFilter
+	m.doSearch()
+}
+
+func (m *Model) onSearchQuit() {
+	m.searchInput.Blur()
+	m.searchMode = searchModeOff
+	m.searchResult = ""
+	m.searchInput.Reset()
+	m.searchResultPos = []int{}
+	m.viewport.SetContent(m.content)
+}
+
+func (m *Model) doSearch() {
+	m.searchResultPos = []int{}
+	if m.searchResult == "" {
+		return
+	}
+
+	contentLower := strings.ToLower(m.content)
+	searchLower := strings.ToLower(m.searchResult)
+	offset := 0
+
+	for {
+		index := strings.Index(contentLower[offset:], searchLower)
+		if index == -1 {
+			break
+		}
+		m.searchResultPos = append(m.searchResultPos, offset+index)
+		offset += index + len(searchLower)
+	}
+
+	m.updateViewportContent()
+}
+
+func (m *Model) updateViewportContent() {
+	if m.searchResult == "" {
+		m.viewport.SetContent(m.content)
+		return
+	}
+
+	var highlightedContent strings.Builder
+	lastIndex := 0
+	for _, matchIndex := range m.searchResultPos {
+		highlightedContent.WriteString(m.content[lastIndex:matchIndex])
+		highlightedContent.WriteString(m.Styles.Highlight.Render(m.content[matchIndex : matchIndex+len(m.searchResult)]))
+		lastIndex = matchIndex + len(m.searchResult)
+	}
+	highlightedContent.WriteString(m.content[lastIndex:])
+
+	m.viewport.SetContent(highlightedContent.String())
 }

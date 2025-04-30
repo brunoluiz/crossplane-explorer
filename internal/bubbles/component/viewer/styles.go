@@ -10,6 +10,7 @@ type Styles struct {
 	SideTitle lipgloss.Style
 	Viewport  lipgloss.Style
 	Footer    lipgloss.Style
+	Highlight lipgloss.Style
 }
 
 func DefaultStyles() Styles {
@@ -27,10 +28,12 @@ func DefaultStyles() Styles {
 			Padding(0, 1, 0, 1).
 			Margin(1, 0, 0, 1),
 		Viewport: lipgloss.NewStyle().
-			// Border(lipgloss.NormalBorder(), true, true, true, true).
 			Margin(1, 0, 0, 1).
 			Padding(0, 1, 0, 1),
 		Footer: lipgloss.NewStyle().
 			Padding(0, 1, 0, 1),
+		Highlight: lipgloss.NewStyle().
+			Background(lipgloss.Color("201")).
+			Foreground(lipgloss.Color("230")),
 	}
 }
