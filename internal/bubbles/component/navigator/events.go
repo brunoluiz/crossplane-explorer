@@ -100,12 +100,15 @@ func (m *Model) onSearch(msg tea.KeyMsg) tea.Cmd {
 
 func (m *Model) doSearch() {
 	searchTerm := strings.ToLower(m.searchInput.Value())
-	m.cursorBySearchCursor = []int{}
-	for i, v := range m.data {
+	m.cursorBySearchCursor = map[int]int{}
+	match := 0
+	for pos, v := range m.data {
 		if strings.Contains(strings.ToLower(v.ID), searchTerm) {
-			m.cursorBySearchCursor = append(m.cursorBySearchCursor, i)
+			m.cursorBySearchCursor[match] = pos
+			match++
 		}
 	}
+
 	if len(m.cursorBySearchCursor) > 0 {
 		m.searchCursor = 0
 		m.cursor = m.cursorBySearchCursor[0]
@@ -129,7 +132,7 @@ func (m *Model) onSearchQuit() {
 	m.searchMode = searchModeOff
 	m.searchResult = ""
 	m.searchCursor = 0
-	m.cursorBySearchCursor = []int{}
+	m.cursorBySearchCursor = map[int]int{}
 	m.searchCursorByCursor = map[int]int{}
 	m.doLoadTable()
 }

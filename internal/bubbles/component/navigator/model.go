@@ -59,7 +59,7 @@ type Model struct {
 	searchMode           searchMode
 	searchResult         string
 	searchCursor         int
-	cursorBySearchCursor []int
+	cursorBySearchCursor map[int]int
 	searchCursorByCursor map[int]int
 
 	data []DataRow
@@ -86,7 +86,7 @@ func New(
 		Help:     help.New(),
 
 		searchCursor:         0,
-		cursorBySearchCursor: []int{},
+		cursorBySearchCursor: map[int]int{},
 		searchCursorByCursor: map[int]int{},
 	}
 }
