@@ -101,10 +101,13 @@ func (m *Model) onSearch(msg tea.KeyMsg) tea.Cmd {
 func (m *Model) doSearch() {
 	searchTerm := strings.ToLower(m.searchInput.Value())
 	m.cursorBySearchCursor = map[int]int{}
+	m.searchCursorByCursor = map[int]int{}
+
 	match := 0
 	for pos, v := range m.data {
 		if strings.Contains(strings.ToLower(v.ID), searchTerm) {
 			m.cursorBySearchCursor[match] = pos
+			m.searchCursorByCursor[pos] = match
 			match++
 		}
 	}
@@ -142,13 +145,22 @@ func (m *Model) onSearchNext() tea.Cmd {
 		return nil
 	}
 
-	// TODO: probably the first thing that needs to be done here is to reset the
-	// searchCursor to the current cursor and then try to execute the next logic
-	if m.cursorBySearchCursor[m.searchCursor] < m.cursor {
-		// TODO
+	// Behaviour within boundaries of search highlighted range
+	// If m.cursor is within the highlighted range, resets the position to the cursor itself.
+	// This will be the point of reference to be used.
+	if m.cursorBySearchCursor[0] <= m.cursor && m.cursor <= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1] {
+		m.searchCursor = m.searchCursorByCursor[m.cursor]
+		m.searchCursor++
+		// Behaviour for out of left boundary
+	} else if m.cursor < m.cursorBySearchCursor[0] {
+		m.searchCursor = 0
+		// Behaviour for out of right boundary
+	} else if m.cursor >= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1] {
+		m.searchCursor = 0
+	} else {
+		m.searchCursor++
 	}
 
-	m.searchCursor++
 	if m.searchCursor >= len(m.cursorBySearchCursor) {
 		m.searchCursor = 0 // Wrap around to the first result
 	}
@@ -165,11 +177,22 @@ func (m *Model) onSearchPrev() tea.Cmd {
 		return nil
 	}
 
-	if m.cursorBySearchCursor[m.searchCursor] <= m.searchCursor {
-		m.searchCursor = m.cursor // FIXME
+	// Behaviour within boundaries of search highlighted range
+	// If m.cursor is within the highlighted range, resets the position to the cursor itself.
+	// This will be the point of reference to be used.
+	if m.cursorBySearchCursor[0] <= m.cursor && m.cursor <= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1] {
+		m.searchCursor = m.searchCursorByCursor[m.cursor]
+		m.searchCursor--
+		// Behaviour for out of left boundary
+	} else if m.cursor < m.cursorBySearchCursor[0] {
+		m.searchCursor = 0
+		// Behaviour for out of right boundary
+	} else if m.cursor >= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1] {
+		m.searchCursor = len(m.cursorBySearchCursor) - 1
+	} else {
+		m.searchCursor--
 	}
 
-	m.searchCursor--
 	if m.searchCursor < 0 {
 		m.searchCursor = len(m.cursorBySearchCursor) - 1 // Wrap around to the last result
 	}
