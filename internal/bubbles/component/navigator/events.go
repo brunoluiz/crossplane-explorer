@@ -145,19 +145,20 @@ func (m *Model) onSearchNext() tea.Cmd {
 		return nil
 	}
 
+	switch {
 	// Behaviour within boundaries of search highlighted range
 	// If m.cursor is within the highlighted range, resets the position to the cursor itself.
 	// This will be the point of reference to be used.
-	if m.cursorBySearchCursor[0] <= m.cursor && m.cursor <= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1] {
+	case m.cursorBySearchCursor[0] <= m.cursor && m.cursor <= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1]:
 		m.searchCursor = m.searchCursorByCursor[m.cursor]
 		m.searchCursor++
 		// Behaviour for out of left boundary
-	} else if m.cursor < m.cursorBySearchCursor[0] {
+	case m.cursor < m.cursorBySearchCursor[0]:
 		m.searchCursor = 0
 		// Behaviour for out of right boundary
-	} else if m.cursor >= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1] {
+	case m.cursor >= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1]:
 		m.searchCursor = 0
-	} else {
+	default:
 		m.searchCursor++
 	}
 
@@ -177,19 +178,20 @@ func (m *Model) onSearchPrev() tea.Cmd {
 		return nil
 	}
 
+	switch {
 	// Behaviour within boundaries of search highlighted range
 	// If m.cursor is within the highlighted range, resets the position to the cursor itself.
 	// This will be the point of reference to be used.
-	if m.cursorBySearchCursor[0] <= m.cursor && m.cursor <= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1] {
+	case (m.cursorBySearchCursor[0] <= m.cursor && m.cursor <= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1]):
 		m.searchCursor = m.searchCursorByCursor[m.cursor]
 		m.searchCursor--
 		// Behaviour for out of left boundary
-	} else if m.cursor < m.cursorBySearchCursor[0] {
+	case m.cursor < m.cursorBySearchCursor[0]:
 		m.searchCursor = 0
 		// Behaviour for out of right boundary
-	} else if m.cursor >= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1] {
+	case m.cursor >= m.cursorBySearchCursor[len(m.cursorBySearchCursor)-1]:
 		m.searchCursor = len(m.cursorBySearchCursor) - 1
-	} else {
+	default:
 		m.searchCursor--
 	}
 
