@@ -64,6 +64,9 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 	headerHeight := lipgloss.Height(m.headerView())
 	footerHeight := lipgloss.Height(m.footerView())
+	if m.searchMode != searchModeOff {
+		footerHeight += lipgloss.Height(m.searchInput.View())
+	}
 	verticalMarginHeight := headerHeight + footerHeight
 
 	if !m.ready {

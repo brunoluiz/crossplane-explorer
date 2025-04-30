@@ -99,6 +99,7 @@ func (m Model) View() string {
 	}
 
 	var components []string
+	viewportHeight := m.viewport.Height
 
 	switch m.searchMode {
 	case searchModeInit:
@@ -106,9 +107,11 @@ func (m Model) View() string {
 	case searchModeInput:
 		searchBar := lipgloss.NewStyle().Render(m.searchInput.View())
 		components = append(components, searchBar)
+		viewportHeight--
 	case searchModeFilter:
 		filterBar := lipgloss.NewStyle().Render(fmt.Sprintf("🔍 Showing results for: %s", m.searchInput.Value()))
 		components = append(components, filterBar)
+		viewportHeight--
 	}
 
 	header := m.headerView()
