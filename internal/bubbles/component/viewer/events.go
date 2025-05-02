@@ -162,9 +162,15 @@ func (m *Model) updateViewportContent() {
 
 	var highlightedContent strings.Builder
 	lastIndex := 0
-	for _, matchIndex := range m.searchResultPos {
+	for i, matchIndex := range m.searchResultPos {
 		highlightedContent.WriteString(m.content[lastIndex:matchIndex])
-		highlightedContent.WriteString(m.Styles.Highlight.Render(m.content[matchIndex : matchIndex+len(m.searchResult)]))
+		style := m.Styles.SearchItem
+
+		// Highlight the current search result
+		if i == m.searchCursor {
+			style = m.Styles.SearchCurrentItem
+		}
+		highlightedContent.WriteString(style.Render(m.content[matchIndex : matchIndex+len(m.searchResult)]))
 		lastIndex = matchIndex + len(m.searchResult)
 	}
 	highlightedContent.WriteString(m.content[lastIndex:])
