@@ -55,6 +55,10 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 		m.onSearchInit()
 	case key.Matches(msg, m.KeyMap.SearchConfirm):
 		m.onSearchConfirm()
+	case key.Matches(msg, m.KeyMap.SearchNext):
+		m.onSearchNext()
+	case key.Matches(msg, m.KeyMap.SearchPrevious):
+		m.onSearchPrevious()
 	case key.Matches(msg, m.KeyMap.SearchQuit):
 		m.onSearchQuit()
 	}
@@ -166,4 +170,56 @@ func (m *Model) updateViewportContent() {
 	highlightedContent.WriteString(m.content[lastIndex:])
 
 	m.viewport.SetContent(highlightedContent.String())
+}
+
+func (m *Model) onSearchNext() {
+	if len(m.searchResultPos) == 0 {
+		return
+	}
+
+	m.searchCursor++
+	if m.searchCursor >= len(m.searchResultPos) {
+		m.searchCursor = 0 // Wrap around to the first result
+	}
+
+	// Adjust viewport to show the next result
+	m.adjustViewportPosition()
+	m.updateViewportContent()
+}
+
+func (m *Model) onSearchPrevious() {
+	if len(m.searchResultPos) == 0 {
+		return
+	}
+
+	// // If no selection exists, start at the end
+	// if m.searchCursor == 0 {
+	// 	m.searchCursor = len(m.searchResultPos) - 1
+	// 	m.updateViewportContent()
+	// 	return
+	// }
+
+	m.searchCursor--
+	if m.searchCursor < 0 {
+		m.searchCursor = len(m.searchResultPos) - 1 // Wrap around to the last result
+	}
+
+	// Adjust viewport to show the previous result
+	m.adjustViewportPosition()
+	m.updateViewportContent()
+}
+
+// adjustViewportPosition adjust the viewport position to show the selected search result
+func (m *Model) adjustViewportPosition() {
+	if len(m.searchResultPos) == 0 {
+		return
+	}
+
+	selectedPosition := m.searchResultPos[m.searchCursor]
+
+	// Calculate the line number of the selected position
+	lineNumber := strings.Count(m.content[:selectedPosition], "\n")
+
+	// Adjust the viewport to show the selected line
+	m.viewport.SetYOffset(lineNumber)
 }

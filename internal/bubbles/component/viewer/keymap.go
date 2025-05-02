@@ -16,9 +16,11 @@ type KeyMap struct {
 	CloseFullHelp key.Binding
 	Quit          key.Binding
 
-	Search        key.Binding
-	SearchConfirm key.Binding
-	SearchQuit    key.Binding
+	Search         key.Binding
+	SearchConfirm  key.Binding
+	SearchQuit     key.Binding
+	SearchNext     key.Binding
+	SearchPrevious key.Binding
 }
 
 // DefaultKeyMap returns a set of default keybindings.
@@ -80,6 +82,14 @@ func DefaultKeyMap() KeyMap {
 			key.WithKeys("esc"),
 			key.WithHelp("esc", "quit search"),
 		),
+		SearchNext: key.NewBinding(
+			key.WithKeys("n"),
+			key.WithHelp("n", "next search"),
+		),
+		SearchPrevious: key.NewBinding(
+			key.WithKeys("N"),
+			key.WithHelp("N", "previous search"),
+		),
 	}
 }
 
@@ -99,6 +109,7 @@ func (k KeyMap) FullHelp() [][]key.Binding {
 		{k.LineUp, k.LineDown, k.GotoTop, k.GotoBottom},
 		{k.PageUp, k.PageDown, k.HalfPageUp, k.HalfPageDown},
 		{k.Search, k.SearchConfirm, k.SearchQuit},
+		{k.SearchNext, k.SearchPrevious},
 		{k.Help, k.Quit},
 	}
 }
