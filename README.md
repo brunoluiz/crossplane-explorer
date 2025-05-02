@@ -59,4 +59,3 @@ crossplane-explorer trace -n namespace Object/hello-world
 - Add kubectl describe on `Enter` or `d` press
 - Open issue around issues on colour rendering on tables bubbles (reason why I had to fork)
 - Open issue at crossplane so people can use their tracing parsers
-- Add search capability to the `viewer`
