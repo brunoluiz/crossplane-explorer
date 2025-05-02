@@ -65,13 +65,18 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	return nil
 }
 
-func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
+func (m *Model) setViewportHeight(h int) {
 	headerHeight := lipgloss.Height(m.headerView())
 	footerHeight := lipgloss.Height(m.footerView())
 	if m.searchMode != searchModeOff {
 		footerHeight += lipgloss.Height(m.searchInput.View())
 	}
 	verticalMarginHeight := headerHeight + footerHeight
+	m.viewport.Height = h - verticalMarginHeight
+}
+
+func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
+	m.height = msg.Height
 
 	if !m.ready {
 		// Since this program is using the full size of the viewport we
@@ -79,7 +84,8 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 		// we can initialize the viewport. The initial dimensions come in
 		// quickly, though asynchronously, which is why we wait for them
 		// here.
-		m.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
+		headerHeight := lipgloss.Height(m.headerView())
+		m.viewport = viewport.New(msg.Width, 0)
 		m.viewport.Style = m.Styles.Viewport
 		m.viewport.YPosition = headerHeight
 		m.viewport.HighPerformanceRendering = m.useHighPerformanceRenderer
@@ -95,9 +101,10 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 		//
 		// Render the viewport one line below the header.
 		m.viewport.YPosition = headerHeight + 1
+		m.setViewportHeight(msg.Height)
 	} else {
 		m.viewport.Width = msg.Width
-		m.viewport.Height = msg.Height - verticalMarginHeight
+		m.setViewportHeight(msg.Height)
 	}
 
 	if m.useHighPerformanceRenderer {
@@ -117,6 +124,7 @@ func (m *Model) onSearchInit() {
 	}
 	m.searchMode = searchModeInit
 	m.searchInput.Focus()
+	m.setViewportHeight(m.height)
 }
 
 func (m *Model) onSearchConfirm() {
@@ -133,6 +141,7 @@ func (m *Model) onSearchQuit() {
 	m.searchInput.Reset()
 	m.searchResultPos = []int{}
 	m.viewport.SetContent(m.content)
+	m.setViewportHeight(m.height)
 }
 
 func (m *Model) doSearch() {

@@ -28,6 +28,7 @@ type Model struct {
 	useHighPerformanceRenderer bool
 
 	ready    bool
+	height   int
 	viewport viewport.Model
 
 	searchInput     textinput.Model
