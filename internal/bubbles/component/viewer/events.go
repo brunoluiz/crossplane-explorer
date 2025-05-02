@@ -112,6 +112,9 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 }
 
 func (m *Model) onSearchInit() {
+	if m.searchMode != searchModeOff {
+		m.onSearchQuit()
+	}
 	m.searchMode = searchModeInit
 	m.searchInput.Focus()
 }
