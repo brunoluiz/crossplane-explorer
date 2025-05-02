@@ -6,10 +6,12 @@ import (
 )
 
 type Styles struct {
-	Title     lipgloss.Style
-	SideTitle lipgloss.Style
-	Viewport  lipgloss.Style
-	Footer    lipgloss.Style
+	Title             lipgloss.Style
+	SideTitle         lipgloss.Style
+	Viewport          lipgloss.Style
+	Footer            lipgloss.Style
+	SearchItem        lipgloss.Style
+	SearchCurrentItem lipgloss.Style
 }
 
 func DefaultStyles() Styles {
@@ -27,10 +29,16 @@ func DefaultStyles() Styles {
 			Padding(0, 1, 0, 1).
 			Margin(1, 0, 0, 1),
 		Viewport: lipgloss.NewStyle().
-			// Border(lipgloss.NormalBorder(), true, true, true, true).
 			Margin(1, 0, 0, 1).
 			Padding(0, 1, 0, 1),
 		Footer: lipgloss.NewStyle().
 			Padding(0, 1, 0, 1),
+		SearchItem: lipgloss.NewStyle().
+			Background(lipgloss.Color("201")).
+			Foreground(lipgloss.Color("230")),
+		SearchCurrentItem: lipgloss.NewStyle().
+			Background(lipgloss.Color("226")).
+			Foreground(lipgloss.Color("232")).
+			Underline(true),
 	}
 }

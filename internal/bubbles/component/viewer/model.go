@@ -3,6 +3,7 @@ package viewer
 import (
 	"fmt"
 
+	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -27,8 +28,24 @@ type Model struct {
 	useHighPerformanceRenderer bool
 
 	ready    bool
+	height   int
 	viewport viewport.Model
+
+	searchInput     textinput.Model
+	searchMode      searchMode
+	searchResult    string
+	searchCursor    int
+	searchResultPos []int
 }
+
+type searchMode int
+
+const (
+	searchModeOff searchMode = iota
+	searchModeInit
+	searchModeInput
+	searchModeFilter
+)
 
 type WithOpt func(*Model)
 
@@ -45,11 +62,20 @@ func WithHighPerformanceRenderer(enabled bool) func(m *Model) {
 }
 
 func New(opts ...WithOpt) Model {
+	ti := textinput.New()
+	ti.Prompt = "🔍 "
+	ti.Placeholder = "Search..."
+
 	m := Model{
 		KeyMap:                     DefaultKeyMap(),
 		Styles:                     DefaultStyles(),
 		cmdQuit:                    func() tea.Msg { return EventQuit{} },
 		useHighPerformanceRenderer: false,
+		searchInput:                ti,
+		searchMode:                 searchModeOff,
+		searchResult:               "",
+		searchCursor:               0,
+		searchResultPos:            []int{},
 	}
 
 	for _, opt := range opts {
@@ -72,7 +98,26 @@ func (m Model) View() string {
 	if !m.ready {
 		return "\n  Initializing..."
 	}
-	return fmt.Sprintf("%s\n%s\n%s", m.headerView(), m.viewport.View(), m.footerView())
+
+	var components []string
+
+	switch m.searchMode {
+	case searchModeInit:
+		fallthrough
+	case searchModeInput:
+		searchBar := lipgloss.NewStyle().Render(m.searchInput.View())
+		components = append(components, searchBar)
+	case searchModeFilter:
+		filterBar := lipgloss.NewStyle().Render(fmt.Sprintf("🔍 Showing results for: %s", m.searchInput.Value()))
+		components = append(components, filterBar)
+	}
+
+	header := m.headerView()
+	footer := m.footerView()
+
+	components = append([]string{header, m.viewport.View(), footer}, components...)
+
+	return lipgloss.JoinVertical(lipgloss.Left, components...)
 }
 
 type ContentInput struct {
