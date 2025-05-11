@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-  🧰 Enhanced Crossplane explorer
+  🧰 A terminal based UI to explore Crossplane traces
 </p>
 
 ![screenshot](./screenshot.png)
