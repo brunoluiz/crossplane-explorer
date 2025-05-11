@@ -85,7 +85,7 @@
                   "annotations": {
                     "crossplane.io/composition-resource-name": "two"
                   },
-                  "name": "test-resource-child-1-bucket-hash"
+                  "name": "test-resource-leaf-1-bucket-hash"
                 },
                 "status": {
                   "conditions": [
@@ -97,7 +97,7 @@
                     },
                     {
                       "lastTransitionTime": null,
-                      "message": "Error with bucket child 1: Sint eu mollit tempor ad minim do commodo irure. Magna labore irure magna. Non cillum id nulla. Anim culpa do duis consectetur.",
+                      "message": "Error with bucket leaf 1: Sint eu mollit tempor ad minim do commodo irure. Magna labore irure magna. Non cillum id nulla. Anim culpa do duis consectetur.",
                       "reason": "SomethingWrongHappened",
                       "status": "False",
                       "type": "Ready"
@@ -114,13 +114,13 @@
                   "annotations": {
                     "crossplane.io/composition-resource-name": "three"
                   },
-                  "name": "test-resource-child-mid-bucket-hash"
+                  "name": "test-resource-leaf-mid-bucket-hash"
                 },
                 "status": {
                   "conditions": [
                     {
                       "lastTransitionTime": null,
-                      "message": "Sync error with bucket child mid",
+                      "message": "Sync error with bucket leaf mid",
                       "reason": "CantSync",
                       "status": "False",
                       "type": "Synced"
@@ -143,7 +143,7 @@
                   "annotations": {
                     "crossplane.io/composition-resource-name": "four"
                   },
-                  "name": "test-resource-child-1-bucket-hash"
+                  "name": "test-resource-leaf-1-bucket-hash"
                 },
                 "status": {
                   "conditions": [
@@ -155,7 +155,7 @@
                     },
                     {
                       "lastTransitionTime": null,
-                      "message": "Error with bucket child 2",
+                      "message": "Error with bucket leaf 2",
                       "reason": "SomethingWrongHappened",
                       "status": "False",
                       "type": "Ready"
@@ -172,7 +172,7 @@
                       "annotations": {
                         "crossplane.io/composition-resource-name": ""
                       },
-                      "name": "test-resource-child-1-1-bucket-hash"
+                      "name": "test-resource-leaf-1-1-bucket-hash"
                     },
                     "status": {
                       "conditions": [
