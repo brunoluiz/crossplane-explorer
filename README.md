@@ -8,9 +8,9 @@
 
 ![demo gif](./demo.gif)
 
-`crossplane trace` is a very handy tool, but it is not interactive and it requires a few extra
-hops when debugging its traced objects. This tool provides a terminal based UI, similar to `k9s`,
-to explore these traces, making it easier to navigate, debug and understand Crossplane objects.
+`crossplane-explorer` provides a terminal based UI (similar to `k9s`) to explore Crossplane traces,
+making it easier to navigate, debug and understand objects. It leverages `crossplane trace` to
+render the object tree.
 
 ## ✨ Features
 
