@@ -10,11 +10,12 @@ require (
 	github.com/charmbracelet/x/ansi v0.6.0
 	github.com/crossplane/crossplane v1.18.2
 	github.com/crossplane/crossplane-runtime v1.18.0
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/goccy/go-yaml v1.15.13
 	github.com/google/go-containerregistry v0.19.2
 	github.com/mattn/go-runewidth v0.0.16
 	github.com/mistakenelf/teacup v0.4.1
-	github.com/samber/lo v1.47.0
+	github.com/samber/lo v1.51.0
 	github.com/urfave/cli/v3 v3.0.0-beta1
 	k8s.io/api v0.31.2
 	k8s.io/apimachinery v0.31.2
@@ -25,7 +26,6 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
-	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/emicklei/go-restful/v3 v3.12.1 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
 	github.com/evanphx/json-patch/v5 v5.9.0 // indirect
@@ -67,10 +67,10 @@ require (
 	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/oauth2 v0.22.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/term v0.27.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/time v0.6.0 // indirect
 	golang.org/x/tools v0.26.0 // indirect
 	google.golang.org/protobuf v1.35.1 // indirect
