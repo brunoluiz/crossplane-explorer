@@ -1,6 +1,6 @@
 module github.com/brunoluiz/crossplane-explorer
 
-go 1.24.2
+go 1.24.4
 
 require (
 	github.com/atotto/clipboard v0.1.4
@@ -10,6 +10,7 @@ require (
 	github.com/charmbracelet/x/ansi v0.6.0
 	github.com/crossplane/crossplane v1.18.2
 	github.com/crossplane/crossplane-runtime v1.18.0
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/goccy/go-yaml v1.15.13
 	github.com/google/go-containerregistry v0.19.2
 	github.com/mattn/go-runewidth v0.0.16
@@ -25,7 +26,6 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
-	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/emicklei/go-restful/v3 v3.12.1 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
 	github.com/evanphx/json-patch/v5 v5.9.0 // indirect
