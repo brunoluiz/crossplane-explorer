@@ -9,7 +9,7 @@ require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/charmbracelet/x/ansi v0.9.3
 	github.com/crossplane/crossplane v1.18.2
-	github.com/crossplane/crossplane-runtime v1.18.0
+	github.com/crossplane/crossplane-runtime v1.20.0
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/goccy/go-yaml v1.15.13
 	github.com/google/go-containerregistry v0.20.6

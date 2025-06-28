@@ -35,6 +35,8 @@ github.com/crossplane/crossplane v1.18.2 h1:vKhztJ/FVUPetiEolQfBB13vcTS2cp8papat
 github.com/crossplane/crossplane v1.18.2/go.mod h1:Bq2LnU+VEA9V8rwSgHGV6614dU52itjN28SYwmR2Oc4=
 github.com/crossplane/crossplane-runtime v1.18.0 h1:aAQIMNOgPbbXaqj9CUSv+gPl3QnVbn33YlzSe145//0=
 github.com/crossplane/crossplane-runtime v1.18.0/go.mod h1:p7nVVsLn0CWjsLvLCtr7T40ErbTgNWKRxmYnwFdfXb4=
+github.com/crossplane/crossplane-runtime v1.20.0 h1:I54uipRIecqZyms+vz1J/l62yjVQ7HV5w+Nh3RMrUtc=
+github.com/crossplane/crossplane-runtime v1.20.0/go.mod h1:lfV1VJenDc9PNVLxDC80YjPoTm+JdSZ13xlS2h37Dvg=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
