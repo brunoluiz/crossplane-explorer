@@ -19,14 +19,6 @@ type Model struct {
 	cmdQuit tea.Cmd
 	Styles  Styles
 
-	// You generally won't need this unless you're processing stuff with
-	// complicated ANSI escape sequences. Turn it on if you notice flickering.
-	//
-	// Also keep in mind that high performance rendering only works for programs
-	// that use the full size of the terminal. We're enabling that below with
-	// tea.EnterAltScreen().
-	useHighPerformanceRenderer bool
-
 	ready    bool
 	height   int
 	viewport viewport.Model
@@ -55,27 +47,20 @@ func WithQuitCmd(c tea.Cmd) func(m *Model) {
 	}
 }
 
-func WithHighPerformanceRenderer(enabled bool) func(m *Model) {
-	return func(m *Model) {
-		m.useHighPerformanceRenderer = enabled
-	}
-}
-
 func New(opts ...WithOpt) Model {
 	ti := textinput.New()
 	ti.Prompt = "🔍 "
 	ti.Placeholder = "Search..."
 
 	m := Model{
-		KeyMap:                     DefaultKeyMap(),
-		Styles:                     DefaultStyles(),
-		cmdQuit:                    func() tea.Msg { return EventQuit{} },
-		useHighPerformanceRenderer: false,
-		searchInput:                ti,
-		searchMode:                 searchModeOff,
-		searchResult:               "",
-		searchCursor:               0,
-		searchResultPos:            []int{},
+		KeyMap:          DefaultKeyMap(),
+		Styles:          DefaultStyles(),
+		cmdQuit:         func() tea.Msg { return EventQuit{} },
+		searchInput:     ti,
+		searchMode:      searchModeOff,
+		searchResult:    "",
+		searchCursor:    0,
+		searchResultPos: []int{},
 	}
 
 	for _, opt := range opts {
@@ -128,7 +113,7 @@ type ContentInput struct {
 
 func (m *Model) setContent(val string) {
 	m.viewport.SetContent(
-		lipgloss.NewStyle().Width(m.GetWidth()).Render(string(val)),
+		lipgloss.NewStyle().Width(m.GetWidth()).Render(val),
 	)
 	m.viewport.GotoTop()
 }

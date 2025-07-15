@@ -88,7 +88,6 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 		m.viewport = viewport.New(msg.Width, 0)
 		m.viewport.Style = m.Styles.Viewport
 		m.viewport.YPosition = headerHeight
-		m.viewport.HighPerformanceRendering = m.useHighPerformanceRenderer
 		m.viewport.KeyMap.PageUp.SetKeys(
 			lo.Flatten([][]string{m.KeyMap.PageUp.Keys(), m.viewport.KeyMap.PageUp.Keys()})...)
 		m.viewport.KeyMap.PageDown.SetKeys(
@@ -106,14 +105,6 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 		m.viewport.Width = msg.Width
 		m.setViewportHeight(msg.Height)
 		m.setContent(m.content)
-	}
-
-	if m.useHighPerformanceRenderer {
-		// Render (or re-render) the whole viewport. Necessary both to
-		// initialize the viewport and when the window is resized.
-		//
-		// This is needed for high-performance rendering only.
-		return viewport.Sync(m.viewport)
 	}
 
 	return nil
