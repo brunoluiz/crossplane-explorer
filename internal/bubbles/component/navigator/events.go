@@ -23,6 +23,10 @@ type EventItemFocused struct {
 	Data any
 }
 
+type EventItemDescribe struct {
+	ID string
+}
+
 type EventQuitted struct{}
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
@@ -224,6 +228,10 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	case key.Matches(msg, m.KeyMap.Copy):
 		return func() tea.Msg {
 			return EventItemCopied{ID: m.Current().ID, Data: m.Current().Data}
+		}
+	case key.Matches(msg, m.KeyMap.Describe):
+		return func() tea.Msg {
+			return EventItemDescribe{ID: m.Current().ID}
 		}
 	case key.Matches(msg, m.KeyMap.SearchQuit):
 		m.onSearchQuit()

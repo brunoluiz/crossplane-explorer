@@ -30,6 +30,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case navigator.EventQuitted:
 		return m, tea.Interrupt
+	case navigator.EventItemDescribe:
+		// TODO: add kubectl calls
+		return m, nil
 	case navigator.EventItemCopied:
 		//nolint // ignore errors
 		clipboard.WriteAll(msg.ID)

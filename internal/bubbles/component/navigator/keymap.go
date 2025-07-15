@@ -18,6 +18,7 @@ type KeyMap struct {
 	SearchQuit     key.Binding
 
 	Copy          key.Binding
+	Describe      key.Binding
 	Show          key.Binding
 	Help          key.Binding
 	CloseFullHelp key.Binding
@@ -75,6 +76,10 @@ func DefaultKeyMap() KeyMap {
 		Copy: key.NewBinding(
 			key.WithKeys("c"),
 			key.WithHelp("c", "copy"),
+		),
+		Describe: key.NewBinding(
+			key.WithKeys("d"),
+			key.WithHelp("d", "describe"),
 		),
 		Show: key.NewBinding(
 			key.WithKeys("enter", "y"),
