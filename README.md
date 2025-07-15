@@ -45,7 +45,7 @@ brew install brunoluiz/tap/crossplane-explorer
 Use `go install` to install it
 
 ```
-go install github.com/brunoluiz/crossplane-explorer@latest
+go install github.com/brunoluiz/crossplane-explorer/cmd/crossplane-explorer@latest
 ```
 
 ## ⚙️ Usage
