@@ -33,7 +33,7 @@ type ContentInput struct {
 
 func (m *Model) SetContent(msg ContentInput) error {
 	obj := msg.Trace.Unstructured.Object
-	ds.WalkMap(obj, func(key string, value interface{}) (interface{}, bool) {
+	ds.WalkMap(obj, func(key string, value any) (any, bool) {
 		// These fields are usually injected server side and make checking objects quite hard
 		if key == "managedFields" || keyHasSuffix(key, ".managedFields") {
 			return nil, false
@@ -50,8 +50,7 @@ func (m *Model) SetContent(msg ContentInput) error {
 		Title:     fmt.Sprintf("%s/%s", msg.Trace.Unstructured.GetKind(), msg.Trace.Unstructured.GetName()),
 		SideTitle: msg.Trace.Unstructured.GetAPIVersion(),
 		Content: m.styles.Main.Render(lipgloss.JoinVertical(
-			lipgloss.Top,
-			string(val),
+			lipgloss.Top, string(val),
 		)),
 	})
 	return nil

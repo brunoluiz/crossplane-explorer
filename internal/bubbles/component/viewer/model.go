@@ -126,12 +126,19 @@ type ContentInput struct {
 	Content   string
 }
 
+func (m *Model) setContent(val string) {
+	m.viewport.SetContent(
+		lipgloss.NewStyle().Width(m.GetWidth()).Render(string(val)),
+	)
+	m.viewport.GotoTop()
+}
+
 func (m *Model) SetContent(msg ContentInput) {
 	m.title = msg.Title
 	m.sideTitle = msg.SideTitle
 	m.content = msg.Content
-	m.viewport.SetContent(msg.Content)
-	m.viewport.GotoTop()
+
+	m.setContent(m.content)
 }
 
 func (m Model) headerView() string {

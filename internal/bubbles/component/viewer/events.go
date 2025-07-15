@@ -105,6 +105,7 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 	} else {
 		m.viewport.Width = msg.Width
 		m.setViewportHeight(msg.Height)
+		m.setContent(m.content)
 	}
 
 	if m.useHighPerformanceRenderer {
