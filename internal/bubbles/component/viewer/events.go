@@ -202,13 +202,6 @@ func (m *Model) onSearchPrevious() {
 		return
 	}
 
-	// // If no selection exists, start at the end
-	// if m.searchCursor == 0 {
-	// 	m.searchCursor = len(m.searchResultPos) - 1
-	// 	m.updateViewportContent()
-	// 	return
-	// }
-
 	m.searchCursor--
 	if m.searchCursor < 0 {
 		m.searchCursor = len(m.searchResultPos) - 1 // Wrap around to the last result

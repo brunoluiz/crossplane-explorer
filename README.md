@@ -76,5 +76,3 @@ crossplane beta trace -o json <> | crossplane-explorer trace --stdin
 ## 🧾 To-do
 
 - Add kubectl describe on `Enter` or `d` press
-- Open issue around issues on colour rendering on tables bubbles (reason why I had to fork)
-- Open issue at crossplane so people can use their tracing parsers
