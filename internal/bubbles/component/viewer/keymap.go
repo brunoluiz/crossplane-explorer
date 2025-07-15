@@ -35,11 +35,11 @@ func DefaultKeyMap() KeyMap {
 			key.WithHelp("↓/j", "scroll down"),
 		),
 		PageUp: key.NewBinding(
-			key.WithKeys("b", "pgup"),
+			key.WithKeys("b", "pgup", "ctrl+b"),
 			key.WithHelp("b/pgup", "page up"),
 		),
 		PageDown: key.NewBinding(
-			key.WithKeys("f", "pgdown", " "),
+			key.WithKeys("f", "pgdown", " ", "ctrl+f"),
 			key.WithHelp("f/pgdn", "page down"),
 		),
 		HalfPageUp: key.NewBinding(

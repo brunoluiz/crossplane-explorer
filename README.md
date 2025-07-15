@@ -30,7 +30,6 @@ making it easier to navigate, debug and understand objects. It leverages `crossp
 
 > ⚠️ **You must have `crossplane` installed, since this application runs the CLI within it**
 
-
 ### Linux and Windows
 
 [Check the releases section](https://github.com/brunoluiz/crossplane-explorer/releases) for more information details.
@@ -70,6 +69,7 @@ crossplane beta trace -o json <> | crossplane-explorer trace --stdin
 - `enter/y`: shows YAML retrieved by crossplane trace
 - `/`: search (ENTER to submit, ESC to clear)
 - `n/N`: navigate between search results
+- `ctrl+f/ctrl+b | f/b | pageUp/pageDown`: jumps full page of results (up or down)
 - `c`: copies path under cursor
 - `q/ctrl+c`: quit
 
