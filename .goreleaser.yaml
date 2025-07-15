@@ -12,6 +12,8 @@ builds:
     goarch: ["amd64", "arm64"]
     main: "./cmd/crossplane-explorer"
     binary: "crossplane-explorer"
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
     ignore:
       - goos: "darwin"
         goarch: "amd64"

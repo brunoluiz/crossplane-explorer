@@ -31,6 +31,7 @@ func main() {
 
 	if err := cmdMain(
 		cmdTrace(),
+		cmdVersion(),
 	).Run(ctx, os.Args); err != nil {
 		log.Println(err)
 	}
