@@ -16,7 +16,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.16
 	github.com/mistakenelf/teacup v0.4.1
 	github.com/samber/lo v1.51.0
-	github.com/urfave/cli/v3 v3.0.0-beta1
+	github.com/urfave/cli/v3 v3.3.8
 	k8s.io/api v0.31.2
 	k8s.io/apimachinery v0.31.2
 )
