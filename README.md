@@ -21,9 +21,9 @@ making it easier to navigate, debug and understand objects. It leverages `crossp
 - 📋 Copy full qualified objects names straight from UI (API group + Kind + name)
 - ♻️ Automatic refresh
 
-### Upcoming
+### Wish-list
 
-- Allow describig objects (kubectl describe)
+- Allow describing objects (kubectl describe)
 - Allow mutating resource annotations (pause, finaliser)
 
 ## 📀 Install
@@ -72,7 +72,3 @@ crossplane beta trace -o json <> | crossplane-explorer trace --stdin
 - `ctrl+f/ctrl+b | f/b | pageUp/pageDown`: jumps full page of results (up or down)
 - `c`: copies path under cursor
 - `q/ctrl+c`: quit
-
-## 🧾 To-do
-
-- Add kubectl describe on `Enter` or `d` press
