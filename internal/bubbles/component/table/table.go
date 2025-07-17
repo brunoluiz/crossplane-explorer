@@ -54,6 +54,13 @@ type KeyMap struct {
 	GotoBottom   key.Binding
 }
 
+// EventCursorUpdated N indicates how much the cursor moved
+type EventCursorUpdated struct {
+	Previous int
+	Current  int
+	Delta    int
+}
+
 // ShortHelp implements the KeyMap interface.
 func (km KeyMap) ShortHelp() []key.Binding {
 	return []key.Binding{km.LineUp, km.LineDown}
@@ -207,6 +214,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	if !m.focus {
 		return m, nil
 	}
+	prev := m.cursor
 
 	//nolint
 	switch msg := msg.(type) {
@@ -228,6 +236,16 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.GotoTop()
 		case key.Matches(msg, m.KeyMap.GotoBottom):
 			m.GotoBottom()
+		}
+	}
+
+	if delta := m.cursor - prev; delta != 0 {
+		return m, func() tea.Msg {
+			return EventCursorUpdated{
+				Current:  m.cursor,
+				Previous: prev,
+				Delta:    delta,
+			}
 		}
 	}
 

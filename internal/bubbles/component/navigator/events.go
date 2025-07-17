@@ -3,6 +3,7 @@ package navigator
 import (
 	"strings"
 
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/table"
 	"github.com/charmbracelet/bubbles/key"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -32,6 +33,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		cmd = m.onResize(msg)
 	case tea.KeyMsg:
 		cmd = m.onKey(msg)
+	case table.EventCursorUpdated:
+		cmd = m.onCursorUpdated(msg)
 	}
 
 	switch m.searchMode {
@@ -57,25 +60,9 @@ func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 	return nil
 }
 
-func (m *Model) onNavUp() tea.Cmd {
-	m.cursor--
-	if m.cursor < 0 {
-		m.cursor = 0
-	}
+func (m *Model) onCursorUpdated(msg table.EventCursorUpdated) tea.Cmd {
+	m.cursor = msg.Current
 	m.doLoadTable()
-
-	return func() tea.Msg {
-		return EventItemFocused{ID: m.Current().ID, Data: m.Current().Data}
-	}
-}
-
-func (m *Model) onNavDown() tea.Cmd {
-	m.cursor++
-	if m.cursor >= len(m.data) {
-		m.cursor = len(m.data) - 1
-	}
-	m.doLoadTable()
-
 	return func() tea.Msg {
 		return EventItemFocused{ID: m.Current().ID, Data: m.Current().Data}
 	}
@@ -214,10 +201,6 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	switch {
 	case key.Matches(msg, m.KeyMap.Search):
 		m.onSearchInit()
-	case key.Matches(msg, m.KeyMap.Up):
-		return m.onNavUp()
-	case key.Matches(msg, m.KeyMap.Down):
-		return m.onNavDown()
 	case key.Matches(msg, m.KeyMap.Help):
 		m.showHelp = !m.showHelp
 		// m.Help.ShowAll = !m.Help.ShowAll
