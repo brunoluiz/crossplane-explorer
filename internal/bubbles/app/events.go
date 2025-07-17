@@ -33,7 +33,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case navigator.EventItemCopied:
 		//nolint // ignore errors
 		clipboard.WriteAll(msg.ID)
-		return m, nil
 	case navigator.EventItemSelected:
 		trace, ok := msg.Data.(*xplane.Resource)
 		if !ok {
