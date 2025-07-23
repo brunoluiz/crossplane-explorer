@@ -32,6 +32,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Interrupt
 	case navigator.EventItemDescribe:
 		// TODO: add kubectl calls
+		m.dumper(msg.ID)
 		return m, nil
 	case navigator.EventItemCopied:
 		//nolint // ignore errors
