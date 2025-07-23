@@ -28,6 +28,14 @@ type EventItemDescribe struct {
 	ID string
 }
 
+type EventItemEdit struct {
+	ID string
+}
+
+type EventItemDelete struct {
+	ID string
+}
+
 type EventQuitted struct{}
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
@@ -215,6 +223,14 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	case key.Matches(msg, m.KeyMap.Describe):
 		return func() tea.Msg {
 			return EventItemDescribe{ID: m.Current().ID}
+		}
+	case key.Matches(msg, m.KeyMap.Delete):
+		return func() tea.Msg {
+			return EventItemDelete{ID: m.Current().ID}
+		}
+	case key.Matches(msg, m.KeyMap.Edit):
+		return func() tea.Msg {
+			return EventItemEdit{ID: m.Current().ID}
 		}
 	case key.Matches(msg, m.KeyMap.SearchQuit):
 		m.onSearchQuit()
