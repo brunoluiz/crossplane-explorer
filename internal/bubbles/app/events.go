@@ -9,7 +9,6 @@ import (
 	"github.com/atotto/clipboard"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/navigator"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/viewer"
-	xviewer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/xpsummary"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -50,15 +49,21 @@ func (m Model) exec(c string, args ...string) tea.Cmd {
 	// cmd.Stderr = os.Stderr
 
 	return tea.ExecProcess(cmd, func(err error) tea.Msg {
-		return nil
+		return err
 	})
 }
 
 func (m Model) pager(c string, args ...string) tea.Cmd {
 	cmd := c + " " + strings.Join(args, " ")
 	pager := os.Getenv("PAGER")
+	// Default for those who never thought about it
 	if pager == "" {
 		pager = "less"
+	}
+	// If we don't do this, it will not render the output as YAML,
+	// since stdin does not tell us much about the format
+	if pager == "bat" {
+		pager = "bat -l yaml"
 	}
 	viewCmd := fmt.Sprintf("%s | %s", cmd, pager)
 
@@ -75,6 +80,14 @@ func (m Model) kubectlEdit(ns, resource string) tea.Cmd {
 
 func (m Model) kubectlDescribe(ns, resource string) tea.Cmd {
 	args := []string{"describe", resource}
+	if ns != "" {
+		args = append(args, "-n", ns)
+	}
+	return m.pager("kubectl", args...)
+}
+
+func (m Model) kubectlGet(ns, resource string) tea.Cmd {
+	args := []string{"get", resource, "-o", "yaml"}
 	if ns != "" {
 		args = append(args, "-n", ns)
 	}
@@ -138,13 +151,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !ok {
 			return m, nil
 		}
-
-		if err := m.viewer.SetContent(xviewer.ContentInput{Trace: trace}); err != nil {
-			m.setIrrecoverableError(err)
-			return m, nil
-		}
-		m.pane = PaneViewer
-		return m, nil
+		ns, _ := GetPath[string](trace.Unstructured.Object, "metadata", "namespace")
+		return m, tea.Batch(tea.HideCursor, m.kubectlGet(ns, msg.ID))
 	}
 
 	switch m.pane {
