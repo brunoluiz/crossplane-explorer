@@ -3,8 +3,7 @@ package app
 import (
 	"github.com/atotto/clipboard"
 	"github.com/brunoluiz/xpdig/internal/bubbles/component/navigator"
-	"github.com/brunoluiz/xpdig/internal/bubbles/component/viewer"
-	xviewer "github.com/brunoluiz/xpdig/internal/bubbles/layout/xpsummary"
+	"github.com/brunoluiz/xpdig/internal/ds"
 	"github.com/brunoluiz/xpdig/internal/xplane"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -25,11 +24,29 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, cmd
 	case tea.KeyMsg:
 		cmd = m.onKey(msg)
-	case viewer.EventQuit:
-		m.pane = PaneNavigator
-		return m, nil
 	case navigator.EventQuitted:
 		return m, tea.Interrupt
+	case navigator.EventItemDescribe:
+		trace, ok := msg.Data.(*xplane.Resource)
+		if !ok {
+			return m, nil
+		}
+		ns, _ := ds.GetPath[string](trace.Unstructured.Object, "metadata", "namespace")
+		return m, tea.Batch(tea.HideCursor, m.kubectl.Describe(ns, msg.ID))
+	case navigator.EventItemEdit:
+		trace, ok := msg.Data.(*xplane.Resource)
+		if !ok {
+			return m, nil
+		}
+		ns, _ := ds.GetPath[string](trace.Unstructured.Object, "metadata", "namespace")
+		return m, tea.Batch(tea.HideCursor, m.kubectl.Edit(ns, msg.ID))
+	case navigator.EventItemDelete:
+		trace, ok := msg.Data.(*xplane.Resource)
+		if !ok {
+			return m, nil
+		}
+		ns, _ := ds.GetPath[string](trace.Unstructured.Object, "metadata", "namespace")
+		return m, tea.Batch(tea.HideCursor, m.kubectl.Delete(ns, msg.ID))
 	case navigator.EventItemCopied:
 		//nolint // ignore errors
 		clipboard.WriteAll(msg.ID)
@@ -38,20 +55,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !ok {
 			return m, nil
 		}
-
-		if err := m.viewer.SetContent(xviewer.ContentInput{Trace: trace}); err != nil {
-			m.setIrrecoverableError(err)
-			return m, nil
-		}
-		m.pane = PaneViewer
-		return m, nil
+		ns, _ := ds.GetPath[string](trace.Unstructured.Object, "metadata", "namespace")
+		return m, tea.Batch(tea.HideCursor, m.kubectl.Get(ns, msg.ID))
 	}
 
 	switch m.pane {
-	case PaneViewer:
-		var viewerCmd tea.Cmd
-		m.viewer, viewerCmd = m.viewer.Update(msg)
-		return m, tea.Batch(cmd, viewerCmd)
 	case PaneNavigator:
 		var navigatorCmd, statusCmd tea.Cmd
 		m.navigator, navigatorCmd = m.navigator.Update(msg)
@@ -67,7 +75,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *Model) onResize(msg tea.WindowSizeMsg) tea.Cmd {
 	var navigatorCmd, viewerCmd tea.Cmd
 	m.navigator, navigatorCmd = m.navigator.Update(msg)
-	m.viewer, viewerCmd = m.viewer.Update(msg)
 
 	return tea.Batch(navigatorCmd, viewerCmd)
 }

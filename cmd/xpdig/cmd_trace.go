@@ -6,12 +6,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/brunoluiz/xpdig/internal/bubbles/action/kubectl"
+	"github.com/brunoluiz/xpdig/internal/bubbles/action/shell"
 	"github.com/brunoluiz/xpdig/internal/bubbles/app"
 	"github.com/brunoluiz/xpdig/internal/bubbles/component/navigator"
 	"github.com/brunoluiz/xpdig/internal/bubbles/component/statusbar"
 	"github.com/brunoluiz/xpdig/internal/bubbles/component/table"
 	"github.com/brunoluiz/xpdig/internal/bubbles/layout/xpnavigator"
-	"github.com/brunoluiz/xpdig/internal/bubbles/layout/xpsummary"
 	"github.com/brunoluiz/xpdig/internal/xplane"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -87,6 +88,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				app.New(
 					logger,
 					dumper,
+					kubectl.New(shell.New()),
 					xpnavigator.New(
 						logger,
 						navigator.New(
@@ -109,7 +111,6 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 						xpnavigator.WithWatchInterval(c.Duration("watch-interval")),
 						xpnavigator.WithShortColumns(c.Bool("short")),
 					),
-					xpsummary.New(),
 				),
 				tea.WithAltScreen(),
 				tea.WithContext(ctx),

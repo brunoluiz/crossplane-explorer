@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	navigatorpane "github.com/brunoluiz/xpdig/internal/bubbles/layout/xpnavigator"
-	viewerpane "github.com/brunoluiz/xpdig/internal/bubbles/layout/xpsummary"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -15,15 +14,21 @@ type Pane string
 const (
 	PaneIrrecoverableError Pane = "error"
 	PaneNavigator          Pane = "tree"
-	PaneViewer             Pane = "summary"
 )
+
+type kubectl interface {
+	Edit(ns, resource string) tea.Cmd
+	Describe(ns, resource string) tea.Cmd
+	Get(ns, resource string) tea.Cmd
+	Delete(ns, resource string) tea.Cmd
+}
 
 type Model struct {
 	keyMap    KeyMap
-	viewer    viewerpane.Model
 	navigator navigatorpane.Model
 	logger    *slog.Logger
 	dumper    func(...any)
+	kubectl   kubectl
 
 	pane Pane
 	err  error
@@ -34,8 +39,8 @@ type WithOpt func(*Model)
 func New(
 	logger *slog.Logger,
 	dumper func(...any),
+	kubectl kubectl,
 	navigatorModel navigatorpane.Model,
-	viewerModel viewerpane.Model,
 	opts ...WithOpt,
 ) *Model {
 	m := &Model{
@@ -43,7 +48,7 @@ func New(
 		logger:    logger,
 		dumper:    dumper,
 		navigator: navigatorModel,
-		viewer:    viewerModel,
+		kubectl:   kubectl,
 		pane:      PaneNavigator,
 	}
 
@@ -57,7 +62,6 @@ func New(
 func (m Model) Init() tea.Cmd {
 	return tea.Batch(
 		m.navigator.Init(),
-		m.viewer.Init(),
 	)
 }
 
@@ -70,8 +74,6 @@ func (m Model) View() string {
 			lipgloss.Left,
 			m.navigator.View(),
 		)
-	case PaneViewer:
-		return m.viewer.View()
 	default:
 		return "No pane selected"
 	}
