@@ -28,7 +28,8 @@ making it easier to navigate, debug and understand objects. It leverages `crossp
 
 ## 📀 Install
 
-> ⚠️ **You must have `crossplane` installed, since this application runs the CLI within it**
+> ⚠️ **You must have `crossplane`, `kubectl` and some pager (eg: `less`) installed, since this application runs the CLI within it**
+> **The pager used will match whatever is used as `PAGER` in your environment (could be `bat`). It defaults to `less`.**
 
 ### Linux and Windows
 
@@ -66,9 +67,11 @@ crossplane beta trace -o json <> | crossplane-explorer trace --stdin
 
 - `h/?`: show help
 - `arrow keys or j/k`: cursor up/down
-- `enter/y`: shows YAML retrieved by crossplane trace
+- `enter/y`: executes `kubectl get` on the resource
+- `d`: executes `kubectl describe` on the resource
+- `e`: executes `kubectl edit` on the resource
+- `ctrl+d`: executes `kubectl delete` on the resource
 - `/`: search (ENTER to submit, ESC to clear)
 - `n/N`: navigate between search results
-- `ctrl+f/ctrl+b | f/b | pageUp/pageDown`: jumps full page of results (up or down)
-- `c`: copies path under cursor
+- `ctrl+f/ctrl+b | pageUp/pageDown`: jumps full page of results (up or down)
 - `q/ctrl+c`: quit
