@@ -1,7 +1,7 @@
 package statusbar
 
 import (
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/navigator"
+	"github.com/brunoluiz/xpdig/internal/bubbles/component/navigator"
 	tea "github.com/charmbracelet/bubbletea"
 )
 

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/brunoluiz/crossplane-explorer/internal/xplane/xpkg"
+	"github.com/brunoluiz/xpdig/internal/xplane/xpkg"
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"

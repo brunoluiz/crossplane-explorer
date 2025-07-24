@@ -1,4 +1,4 @@
-module github.com/brunoluiz/crossplane-explorer
+module github.com/brunoluiz/xpdig
 
 go 1.24.4
 

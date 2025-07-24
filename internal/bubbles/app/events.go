@@ -2,9 +2,9 @@ package app
 
 import (
 	"github.com/atotto/clipboard"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/navigator"
-	"github.com/brunoluiz/crossplane-explorer/internal/ds"
-	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
+	"github.com/brunoluiz/xpdig/internal/bubbles/component/navigator"
+	"github.com/brunoluiz/xpdig/internal/ds"
+	"github.com/brunoluiz/xpdig/internal/xplane"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 )

@@ -6,14 +6,14 @@ import (
 	"os"
 	"time"
 
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/action/kubectl"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/action/shell"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/app"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/navigator"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/statusbar"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/table"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/xpnavigator"
-	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
+	"github.com/brunoluiz/xpdig/internal/bubbles/action/kubectl"
+	"github.com/brunoluiz/xpdig/internal/bubbles/action/shell"
+	"github.com/brunoluiz/xpdig/internal/bubbles/app"
+	"github.com/brunoluiz/xpdig/internal/bubbles/component/navigator"
+	"github.com/brunoluiz/xpdig/internal/bubbles/component/statusbar"
+	"github.com/brunoluiz/xpdig/internal/bubbles/component/table"
+	"github.com/brunoluiz/xpdig/internal/bubbles/layout/xpnavigator"
+	"github.com/brunoluiz/xpdig/internal/xplane"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -25,8 +25,8 @@ import (
 func cmdTrace() *cli.Command {
 	return &cli.Command{
 		Usage: `Explore tracing from Crossplane. Usage is available through arguments or data stream
-1. To load it straight from a live resource using the crossplane CLI, do 'crossplane-explorer trace <object name>'
-2. To load it from a trace JSON file, do 'crossplane beta trace -o json <> | crossplane-explorer trace --stdin'
+1. To load it straight from a live resource using the crossplane CLI, do 'xpdig trace <object name>'
+2. To load it from a trace JSON file, do 'crossplane beta trace -o json <> | xpdig trace --stdin'
 
 Live mode is only available for (1) through the use of --watch / --watch-interval (see flag usage below)`,
 		Name:    "trace",
