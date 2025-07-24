@@ -54,6 +54,7 @@ func New(opts ...Option) Model {
 		Help:   help.New(),
 		styles: DefaultStyles(),
 	}
+	m.viewport.MouseWheelDelta = 50
 
 	for _, opt := range opts {
 		opt(&m)
