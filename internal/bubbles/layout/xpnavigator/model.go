@@ -3,7 +3,6 @@ package xpnavigator
 import (
 	"fmt"
 	"log/slog"
-	"strings"
 	"time"
 
 	"github.com/brunoluiz/xpdig/internal/bubbles/component/navigator"
@@ -204,13 +203,11 @@ func (m *Model) setColumns(gk schema.GroupKind) {
 func (m *Model) setData(data *xplane.Resource) {
 	rows := []navigator.DataRow{}
 	m.kind = data.Unstructured.GroupVersionKind().GroupKind()
-	m.traceToRows(data, &rows, 0, []string{})
+	m.traceToRows(data, &rows, 0, []string{}, []bool{})
 	m.navigator.SetData(rows)
 }
 
-func (m Model) traceToRows(v *xplane.Resource, rows *[]navigator.DataRow, depth int, currentPath []string) {
-	const treeNodePrefix string = " └─"
-
+func (m Model) traceToRows(v *xplane.Resource, rows *[]navigator.DataRow, depth int, currentPath []string, isLastChilds []bool) {
 	name := fmt.Sprintf("%s/%s", v.Unstructured.GetKind(), v.Unstructured.GetName())
 	group := v.Unstructured.GetObjectKind().GroupVersionKind().Group
 	row := navigator.DataRow{
@@ -219,11 +216,23 @@ func (m Model) traceToRows(v *xplane.Resource, rows *[]navigator.DataRow, depth 
 		Columns: []string{},
 	}
 
-	label := name
+	// Build tree prefix
+	var prefix string
 	if depth > 0 {
-		shape := strings.Repeat(" ", (depth-1)) + treeNodePrefix + " "
-		label = shape + label
+		for i := 0; i < depth-1; i++ {
+			if isLastChilds[i] {
+				prefix += "   "
+			} else {
+				prefix += "│  "
+			}
+		}
+		if len(isLastChilds) > 0 && isLastChilds[depth-1] {
+			prefix += "└─ "
+		} else {
+			prefix += "├─ "
+		}
 	}
+	label := prefix + name
 
 	if v.Unstructured.GetAnnotations()["crossplane.io/paused"] == "true" {
 		label += " (paused)"
@@ -274,8 +283,10 @@ func (m Model) traceToRows(v *xplane.Resource, rows *[]navigator.DataRow, depth 
 	path = append(path, name)
 	m.pathByData[row.ID] = path
 
-	for _, cv := range v.Children {
-		m.traceToRows(cv, rows, depth+1, path)
+	// Recursively process children
+	for i, cv := range v.Children {
+		last := i == len(v.Children)-1
+		m.traceToRows(cv, rows, depth+1, path, append(isLastChilds, last))
 	}
 }
 
