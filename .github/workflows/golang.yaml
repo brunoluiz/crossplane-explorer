@@ -18,4 +18,4 @@ jobs:
         with:
           go-version: stable
 
-      - run: go mod download && go build ./cmd/crossplane-explorer
+      - run: go mod download && go build ./cmd/xpdig
