@@ -39,7 +39,7 @@ func (s *Cmd) Pager(c string, args ...string) tea.Cmd {
 	// If we don't do this, it will not render the output as YAML,
 	// since stdin does not tell us much about the format
 	if pager == "bat" {
-		pager = "bat -l yaml"
+		pager = "bat -l yaml --paging always"
 	}
 	viewCmd := fmt.Sprintf("%s | %s", cmd, pager)
 
