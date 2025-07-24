@@ -10,8 +10,8 @@ builds:
       - CGO_ENABLED=0
     goos: ["linux", "darwin", "windows"]
     goarch: ["amd64", "arm64"]
-    main: "./cmd/crossplane-explorer"
-    binary: "crossplane-explorer"
+    main: "./cmd/xpdig"
+    binary: "xpdig"
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
     ignore:
