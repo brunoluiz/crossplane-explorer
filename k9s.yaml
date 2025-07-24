@@ -1,0 +1,14 @@
+plugins:
+  # crossplane-trace list all the relationships with a resource (Claim, Composite, or Managed Resource)
+  # Requires 'crossplane' cli binary installed
+  crossplane-trace:
+    shortCut: t
+    confirm: false
+    description: "Crossplane Trace"
+    scopes:
+      - all
+    command: sh
+    background: false
+    args:
+      - -c
+      - crossplane-explorer trace -n $([[ $NAMESPACE = "-" ]] && echo "default" || echo "$NAMESPACE") $RESOURCE_NAME.$RESOURCE_GROUP/$NAME --watch
