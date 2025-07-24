@@ -25,6 +25,7 @@ making it easier to navigate, debug and understand objects. It leverages `crossp
 ### Dependencies
 
 ⚠️ **You must have `crossplane`, `kubectl` and some pager (eg: `less`) installed, since this application runs these within it.**
+
 **The pager used can be customised via `PAGER` in your environment variables (eg: `bat`). It defaults to `less`.**
 
 ### Linux and Windows
