@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/action/kubectl"
+	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/action/shell"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/app"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/cmd/kubectl"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/cmd/shell"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/navigator"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/statusbar"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/table"
