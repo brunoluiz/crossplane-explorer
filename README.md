@@ -16,20 +16,16 @@ making it easier to navigate, debug and understand objects. It leverages `crossp
 ### Trace
 
 - ✨ Expanded details at a glance, with highlight colouring for possible issues
-- 📖 Show YAML objects from the explorer, without needing to separately execute kubectl
-- 📖 View clean object YAMLs without `managedFields` (useful on apply, not as much on describe/get)
+- 📖 Get, describe, edit and delete objects from the explorer, without needing to separately execute `kubectl
 - 📋 Copy full qualified objects names straight from UI (API group + Kind + name)
 - ♻️ Automatic refresh
 
-### Wish-list
-
-- Allow describing objects (kubectl describe)
-- Allow mutating resource annotations (pause, finaliser)
-
 ## 📀 Install
 
-> ⚠️ **You must have `crossplane`, `kubectl` and some pager (eg: `less`) installed, since this application runs the CLI within it**
-> **The pager used will match whatever is used as `PAGER` in your environment (could be `bat`). It defaults to `less`.**
+### Dependencies
+
+⚠️ **You must have `crossplane`, `kubectl` and some pager (eg: `less`) installed, since this application runs these within it.**
+**The pager used can be customised via `PAGER` in your environment variables (eg: `bat`). It defaults to `less`.**
 
 ### Linux and Windows
 
