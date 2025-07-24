@@ -9,7 +9,13 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func Exec(c string, args ...string) tea.Cmd {
+type Cmd struct{}
+
+func New() *Cmd {
+	return &Cmd{}
+}
+
+func (*Cmd) Exec(c string, args ...string) tea.Cmd {
 	cmd := exec.Command(c, args...)
 	// Inherit environment so $EDITOR is respected
 	cmd.Env = os.Environ()
@@ -23,7 +29,7 @@ func Exec(c string, args ...string) tea.Cmd {
 	})
 }
 
-func Pager(c string, args ...string) tea.Cmd {
+func (s *Cmd) Pager(c string, args ...string) tea.Cmd {
 	cmd := c + " " + strings.Join(args, " ")
 	pager := os.Getenv("PAGER")
 	// Default for those who never thought about it
@@ -37,5 +43,5 @@ func Pager(c string, args ...string) tea.Cmd {
 	}
 	viewCmd := fmt.Sprintf("%s | %s", cmd, pager)
 
-	return Exec(os.Getenv("SHELL"), "-c", viewCmd)
+	return s.Exec(os.Getenv("SHELL"), "-c", viewCmd)
 }
