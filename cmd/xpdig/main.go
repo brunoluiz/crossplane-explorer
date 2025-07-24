@@ -12,7 +12,7 @@ import (
 
 func cmdMain(cmds ...*cli.Command) *cli.Command {
 	return &cli.Command{
-		Name:     "crossplane-explorer",
+		Name:     "xpdig",
 		Usage:    "Set of tools to explore your crossplane resources",
 		Commands: cmds,
 	}

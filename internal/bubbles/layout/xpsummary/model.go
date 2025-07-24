@@ -3,9 +3,9 @@ package xpsummary
 import (
 	"fmt"
 
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/viewer"
-	"github.com/brunoluiz/crossplane-explorer/internal/ds"
-	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
+	"github.com/brunoluiz/xpdig/internal/bubbles/component/viewer"
+	"github.com/brunoluiz/xpdig/internal/ds"
+	"github.com/brunoluiz/xpdig/internal/xplane"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/goccy/go-yaml"

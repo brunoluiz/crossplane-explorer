@@ -2,10 +2,10 @@ package app
 
 import (
 	"github.com/atotto/clipboard"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/navigator"
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/viewer"
-	xviewer "github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/xpsummary"
-	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
+	"github.com/brunoluiz/xpdig/internal/bubbles/component/navigator"
+	"github.com/brunoluiz/xpdig/internal/bubbles/component/viewer"
+	xviewer "github.com/brunoluiz/xpdig/internal/bubbles/layout/xpsummary"
+	"github.com/brunoluiz/xpdig/internal/xplane"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 )

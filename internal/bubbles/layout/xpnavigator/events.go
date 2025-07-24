@@ -3,8 +3,8 @@ package xpnavigator
 import (
 	"time"
 
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/navigator"
-	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
+	"github.com/brunoluiz/xpdig/internal/bubbles/component/navigator"
+	"github.com/brunoluiz/xpdig/internal/xplane"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log/slog"
 
-	navigatorpane "github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/xpnavigator"
-	viewerpane "github.com/brunoluiz/crossplane-explorer/internal/bubbles/layout/xpsummary"
+	navigatorpane "github.com/brunoluiz/xpdig/internal/bubbles/layout/xpnavigator"
+	viewerpane "github.com/brunoluiz/xpdig/internal/bubbles/layout/xpsummary"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )

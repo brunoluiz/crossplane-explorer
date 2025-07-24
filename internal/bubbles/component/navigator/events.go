@@ -3,7 +3,7 @@ package navigator
 import (
 	"strings"
 
-	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/table"
+	"github.com/brunoluiz/xpdig/internal/bubbles/component/table"
 	"github.com/charmbracelet/bubbles/key"
 
 	tea "github.com/charmbracelet/bubbletea"

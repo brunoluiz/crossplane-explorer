@@ -10,7 +10,7 @@ Set Height 600
 Set FontSize 10
 
 Escape
-Type "crossplane-explorer trace --cmd cat ./fixture/crossplane-resource.json"
+Type "xpdig trace --cmd cat ./fixture/crossplane-resource.json"
 Sleep 1s
 Enter
 Sleep 1.5s

@@ -20,7 +20,7 @@ func cmdVersion() *cli.Command {
 		Usage: "prints the cli version",
 		Action: func(_ context.Context, _ *cli.Command) error {
 			s := strings.Join([]string{
-				"app: crossplane-explorer",
+				"app: xpdig",
 				fmt.Sprintf("version: %s", version),
 				fmt.Sprintf("commit: %s", commit),
 				fmt.Sprintf("date: %s", date),
