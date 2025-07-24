@@ -32,3 +32,28 @@ func walkMapRecursive(
 		}
 	}
 }
+
+func GetPath[V any](m map[string]any, path ...string) (V, bool) {
+	var zero V
+	curr := any(m)
+	for i, key := range path {
+		mm, ok := curr.(map[string]any)
+		if !ok {
+			return zero, false
+		}
+		v, exists := mm[key]
+		if !exists {
+			return zero, false
+		}
+		curr = v
+		// If this is the last key, try to cast to V
+		if i == len(path)-1 {
+			val, ok := curr.(V)
+			if ok {
+				return val, true
+			}
+			return zero, false
+		}
+	}
+	return zero, false
+}

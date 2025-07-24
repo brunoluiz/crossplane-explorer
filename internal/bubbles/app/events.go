@@ -3,35 +3,11 @@ package app
 import (
 	"github.com/atotto/clipboard"
 	"github.com/brunoluiz/crossplane-explorer/internal/bubbles/component/navigator"
+	"github.com/brunoluiz/crossplane-explorer/internal/ds"
 	"github.com/brunoluiz/crossplane-explorer/internal/xplane"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 )
-
-func GetPath[V any](m map[string]any, path ...string) (V, bool) {
-	var zero V
-	curr := any(m)
-	for i, key := range path {
-		mm, ok := curr.(map[string]any)
-		if !ok {
-			return zero, false
-		}
-		v, exists := mm[key]
-		if !exists {
-			return zero, false
-		}
-		curr = v
-		// If this is the last key, try to cast to V
-		if i == len(path)-1 {
-			val, ok := curr.(V)
-			if ok {
-				return val, true
-			}
-			return zero, false
-		}
-	}
-	return zero, false
-}
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.dumper("new message", msg)
@@ -55,21 +31,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !ok {
 			return m, nil
 		}
-		ns, _ := GetPath[string](trace.Unstructured.Object, "metadata", "namespace")
+		ns, _ := ds.GetPath[string](trace.Unstructured.Object, "metadata", "namespace")
 		return m, tea.Batch(tea.HideCursor, m.kubectl.Describe(ns, msg.ID))
 	case navigator.EventItemEdit:
 		trace, ok := msg.Data.(*xplane.Resource)
 		if !ok {
 			return m, nil
 		}
-		ns, _ := GetPath[string](trace.Unstructured.Object, "metadata", "namespace")
+		ns, _ := ds.GetPath[string](trace.Unstructured.Object, "metadata", "namespace")
 		return m, tea.Batch(tea.HideCursor, m.kubectl.Edit(ns, msg.ID))
 	case navigator.EventItemDelete:
 		trace, ok := msg.Data.(*xplane.Resource)
 		if !ok {
 			return m, nil
 		}
-		ns, _ := GetPath[string](trace.Unstructured.Object, "metadata", "namespace")
+		ns, _ := ds.GetPath[string](trace.Unstructured.Object, "metadata", "namespace")
 		return m, tea.Batch(tea.HideCursor, m.kubectl.Delete(ns, msg.ID))
 	case navigator.EventItemCopied:
 		//nolint // ignore errors
@@ -79,7 +55,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !ok {
 			return m, nil
 		}
-		ns, _ := GetPath[string](trace.Unstructured.Object, "metadata", "namespace")
+		ns, _ := ds.GetPath[string](trace.Unstructured.Object, "metadata", "namespace")
 		return m, tea.Batch(tea.HideCursor, m.kubectl.Get(ns, msg.ID))
 	}
 
