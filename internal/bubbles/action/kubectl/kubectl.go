@@ -19,33 +19,45 @@ func New(kubectx string, s shell) *Cmd {
 }
 
 func (k *Cmd) Edit(ns, resource string) tea.Cmd {
-	args := []string{"edit", resource, "--context", k.kubectx}
+	args := []string{"edit", resource}
 	if ns != "" {
 		args = append(args, "-n", ns)
+	}
+	if k.kubectx != "" {
+		args = append(args, "--context", k.kubectx)
 	}
 	return k.shell.Exec("kubectl", args...)
 }
 
 func (k *Cmd) Describe(ns, resource string) tea.Cmd {
-	args := []string{"describe", resource, "--context", k.kubectx}
+	args := []string{"describe", resource}
 	if ns != "" {
 		args = append(args, "-n", ns)
+	}
+	if k.kubectx != "" {
+		args = append(args, "--context", k.kubectx)
 	}
 	return k.shell.Pager("kubectl", args...)
 }
 
 func (k *Cmd) Get(ns, resource string) tea.Cmd {
-	args := []string{"get", resource, "-o", "yaml", "--context", k.kubectx}
+	args := []string{"get", resource, "-o", "yaml"}
 	if ns != "" {
 		args = append(args, "-n", ns)
+	}
+	if k.kubectx != "" {
+		args = append(args, "--context", k.kubectx)
 	}
 	return k.shell.Pager("kubectl", args...)
 }
 
 func (k *Cmd) Delete(ns, resource string) tea.Cmd {
-	args := []string{"delete", resource, "--context", k.kubectx}
+	args := []string{"delete", resource}
 	if ns != "" {
 		args = append(args, "-n", ns)
+	}
+	if k.kubectx != "" {
+		args = append(args, "--context", k.kubectx)
 	}
 	return k.shell.Exec("kubectl", args...)
 }
