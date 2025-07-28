@@ -54,7 +54,7 @@ func (k *Cmd) Get(ns, resource string) tea.Cmd {
 func (k *Cmd) Delete(ns, resource string) tea.Cmd {
 	args := []string{"delete", resource}
 	if ns != "" {
-		args = append(args, "-n", ns)
+		args = append(args, "-n", ns, "--wait", "false")
 	}
 	if k.kubectx != "" {
 		args = append(args, "--context", k.kubectx)
