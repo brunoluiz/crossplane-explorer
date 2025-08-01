@@ -9,6 +9,7 @@ import (
 	"github.com/brunoluiz/xpdig/internal/bubbles/component/statusbar"
 	"github.com/brunoluiz/xpdig/internal/bubbles/component/table"
 	"github.com/brunoluiz/xpdig/internal/xplane"
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
@@ -49,6 +50,8 @@ type Model struct {
 	watch         bool
 	watchInterval time.Duration
 	logger        *slog.Logger
+	ready         bool
+	spinner       spinner.Model
 
 	kind       schema.GroupKind
 	pathByData map[string][]string
@@ -81,6 +84,10 @@ func New(
 	tracer Tracer,
 	opts ...WithOpt,
 ) Model {
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
+
 	m := Model{
 		keyMap:        DefaultKeyMap(),
 		logger:        logger,
@@ -92,6 +99,8 @@ func New(
 		watchInterval: 10 * time.Second,
 		short:         true,
 		pathByData:    map[string][]string{},
+		ready:         false,
+		spinner:       s,
 	}
 
 	for _, opt := range opts {
@@ -112,10 +121,18 @@ func (m Model) getTrace() tea.Cmd {
 }
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(m.getTrace())
+	return tea.Batch(m.getTrace(), m.spinner.Tick)
 }
 
 func (m Model) View() string {
+	if !m.ready {
+		return lipgloss.Place(
+			m.width, m.height,
+			lipgloss.Center, lipgloss.Center,
+			lipgloss.JoinHorizontal(lipgloss.Left, m.spinner.View(), " Loading..."),
+		)
+	}
+
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		m.navigator.View(),
@@ -201,6 +218,7 @@ func (m *Model) setColumns(gk schema.GroupKind) {
 }
 
 func (m *Model) setData(data *xplane.Resource) {
+	m.ready = true
 	rows := []navigator.DataRow{}
 	m.kind = data.Unstructured.GroupVersionKind().GroupKind()
 	m.traceToRows(data, &rows, 0, []string{}, []bool{})

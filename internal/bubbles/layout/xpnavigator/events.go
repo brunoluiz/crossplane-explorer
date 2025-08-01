@@ -22,6 +22,12 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.statusbar.SetPath(m.pathByData[msg.ID])
 	}
 
+	if !m.ready {
+		var spinnerCmd tea.Cmd
+		m.spinner, spinnerCmd = m.spinner.Update(msg)
+		return m, spinnerCmd
+	}
+
 	var navigatorCmd tea.Cmd
 	m.navigator, navigatorCmd = m.navigator.Update(msg)
 
