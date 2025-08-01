@@ -171,14 +171,15 @@ func (m *Model) SetColumns(cc []table.Column) {
 func (m Model) ShortHelp() []key.Binding {
 	k := m.KeyMap
 	return append([]key.Binding{},
-		k.Up, k.Down, k.Copy, k.Show,
+		k.Up, k.Down, k.Copy,
+		k.Describe, k.Get, k.Edit, k.Delete,
 		k.Search, k.Help, k.Quit,
 	)
 }
 
 func (m Model) FullHelp() [][]key.Binding {
 	k := m.KeyMap
-	kb := [][]key.Binding{{k.Up, k.Down, k.Copy, k.Show}}
+	kb := [][]key.Binding{{k.Up, k.Down, k.Copy, k.Describe}}
 	return append(kb, []key.Binding{k.Quit, k.CloseFullHelp})
 }
 

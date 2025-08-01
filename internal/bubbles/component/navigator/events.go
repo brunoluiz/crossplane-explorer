@@ -14,7 +14,7 @@ type EventItemCopied struct {
 	Data any
 }
 
-type EventItemSelected struct {
+type EventItemDescribe struct {
 	ID   string
 	Data any
 }
@@ -24,7 +24,7 @@ type EventItemFocused struct {
 	Data any
 }
 
-type EventItemDescribe struct {
+type EventItemGet struct {
 	ID   string
 	Data any
 }
@@ -223,9 +223,9 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 		return func() tea.Msg {
 			return EventItemCopied{ID: m.Current().ID, Data: m.Current().Data}
 		}
-	case key.Matches(msg, m.KeyMap.Describe):
+	case key.Matches(msg, m.KeyMap.Get):
 		return func() tea.Msg {
-			return EventItemDescribe{ID: m.Current().ID, Data: m.Current().Data}
+			return EventItemGet{ID: m.Current().ID, Data: m.Current().Data}
 		}
 	case key.Matches(msg, m.KeyMap.Delete):
 		return func() tea.Msg {
@@ -237,9 +237,9 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 		}
 	case key.Matches(msg, m.KeyMap.SearchQuit):
 		m.onSearchQuit()
-	case key.Matches(msg, m.KeyMap.Show):
+	case key.Matches(msg, m.KeyMap.Describe):
 		return func() tea.Msg {
-			return EventItemSelected{ID: m.Current().ID, Data: m.Current().Data}
+			return EventItemDescribe{ID: m.Current().ID, Data: m.Current().Data}
 		}
 	case key.Matches(msg, m.KeyMap.Quit):
 		return func() tea.Msg {

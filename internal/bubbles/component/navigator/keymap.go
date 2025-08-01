@@ -18,10 +18,10 @@ type KeyMap struct {
 	SearchQuit     key.Binding
 
 	Copy          key.Binding
-	Describe      key.Binding
+	Get           key.Binding
 	Edit          key.Binding
 	Delete        key.Binding
-	Show          key.Binding
+	Describe      key.Binding
 	Help          key.Binding
 	CloseFullHelp key.Binding
 }
@@ -79,9 +79,9 @@ func DefaultKeyMap() KeyMap {
 			key.WithKeys("c"),
 			key.WithHelp("c", "copy"),
 		),
-		Describe: key.NewBinding(
-			key.WithKeys("d"),
-			key.WithHelp("d", "describe"),
+		Get: key.NewBinding(
+			key.WithKeys("y"),
+			key.WithHelp("y", "get (yaml)"),
 		),
 		Edit: key.NewBinding(
 			key.WithKeys("e"),
@@ -91,9 +91,9 @@ func DefaultKeyMap() KeyMap {
 			key.WithKeys("ctrl+d"),
 			key.WithHelp("ctrl+d", "delete"),
 		),
-		Show: key.NewBinding(
-			key.WithKeys("enter", "y"),
-			key.WithHelp("enter/y", "show yaml")),
+		Describe: key.NewBinding(
+			key.WithKeys("enter", "d"),
+			key.WithHelp("d", "describe")),
 		Help: key.NewBinding(
 			key.WithKeys("?", "h"),
 			key.WithHelp("?/h", "toogle help"),

@@ -26,13 +26,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmd = m.onKey(msg)
 	case navigator.EventQuitted:
 		return m, tea.Interrupt
-	case navigator.EventItemDescribe:
+	case navigator.EventItemGet:
 		trace, ok := msg.Data.(*xplane.Resource)
 		if !ok {
 			return m, nil
 		}
 		ns, _ := ds.GetPath[string](trace.Unstructured.Object, "metadata", "namespace")
-		return m, tea.Batch(tea.HideCursor, m.kubectl.Describe(ns, msg.ID))
+		return m, tea.Batch(tea.HideCursor, m.kubectl.Get(ns, msg.ID))
 	case navigator.EventItemEdit:
 		trace, ok := msg.Data.(*xplane.Resource)
 		if !ok {
@@ -50,13 +50,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case navigator.EventItemCopied:
 		//nolint // ignore errors
 		clipboard.WriteAll(msg.ID)
-	case navigator.EventItemSelected:
+	case navigator.EventItemDescribe:
 		trace, ok := msg.Data.(*xplane.Resource)
 		if !ok {
 			return m, nil
 		}
 		ns, _ := ds.GetPath[string](trace.Unstructured.Object, "metadata", "namespace")
-		return m, tea.Batch(tea.HideCursor, m.kubectl.Get(ns, msg.ID))
+		return m, tea.Batch(tea.HideCursor, m.kubectl.Describe(ns, msg.ID))
 	}
 
 	switch m.pane {
