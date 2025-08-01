@@ -64,8 +64,8 @@ crossplane beta trace -o json <> | xpdig trace --stdin
 
 - `h/?`: show help
 - `arrow keys or j/k`: cursor up/down
-- `enter/y`: executes `kubectl get` on the resource
-- `d`: executes `kubectl describe` on the resource
+- `enter/d`: executes `kubectl describe` on the resource
+- `y`: executes `kubectl get` on the resource
 - `e`: executes `kubectl edit` on the resource
 - `ctrl+d`: executes `kubectl delete` on the resource
 - `/`: search (ENTER to submit, ESC to clear)
