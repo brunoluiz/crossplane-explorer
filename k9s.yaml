@@ -1,7 +1,7 @@
 plugins:
-  # crossplane-trace list all the relationships with a resource (Claim, Composite, or Managed Resource)
-  # Requires 'crossplane' cli binary installed
-  crossplane-trace:
+  # xpdig list all the relationships with a resource (Claim, Composite, or Managed Resource)
+  # Requires 'crossplane' and 'xpdig' cli binaries installed
+  xpdig:
     shortCut: t
     confirm: false
     description: "Crossplane Trace"

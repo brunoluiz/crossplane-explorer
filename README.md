@@ -72,3 +72,8 @@ crossplane beta trace -o json <> | xpdig trace --stdin
 - `n/N`: navigate between search results
 - `ctrl+f/ctrl+b | pageUp/pageDown`: jumps full page of results (up or down)
 - `q/ctrl+c`: quit
+
+### `k9s` integration
+
+Since `k9s` [supports plugins](https://k9scli.io/topics/plugins/), there is a basic configuration that can be
+copied to your own setup in [`k9s.yaml`](./k9s.yaml).
