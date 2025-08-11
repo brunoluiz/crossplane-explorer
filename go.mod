@@ -8,7 +8,7 @@ require (
 	github.com/charmbracelet/bubbletea v1.3.6
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/charmbracelet/x/ansi v0.10.1
-	github.com/crossplane/crossplane v1.20.0
+	github.com/crossplane/crossplane v1.20.1
 	github.com/crossplane/crossplane-runtime v1.20.0
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/google/go-containerregistry v0.20.6
