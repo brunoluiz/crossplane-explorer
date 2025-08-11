@@ -1,6 +1,5 @@
 Set Shell fish
 Output out.gif
-# Output out.webm
 Set Theme "Dracula"
 Set Margin 5
 Set MarginFill "#674EFF"
