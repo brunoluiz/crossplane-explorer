@@ -16,7 +16,8 @@ making it easier to navigate, debug and understand objects. It leverages `crossp
 ### Trace
 
 - ✨ Expanded details at a glance, with highlight colouring for possible issues
-- 📖 Get, describe, edit and delete objects from the explorer, without needing to separately execute `kubectl
+- 📖 Get, describe, edit and delete objects from the explorer, without the need to separately execute `kubectl`
+- 🔨 Use your own `$PAGER` and `$EDITOR` when exploring the traces
 - 📋 Copy full qualified objects names straight from UI (API group + Kind + name)
 - ♻️ Automatic refresh
 
