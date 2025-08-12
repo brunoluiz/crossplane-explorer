@@ -2,6 +2,7 @@ package shell
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"os/exec"
 	"strings"
@@ -9,20 +10,24 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type Cmd struct{}
-
-func New() *Cmd {
-	return &Cmd{}
+type Cmd struct {
+	logger *slog.Logger
 }
 
-func (*Cmd) Exec(c string, args ...string) tea.Cmd {
+func New(logger *slog.Logger) *Cmd {
+	return &Cmd{logger: logger}
+}
+
+func (s *Cmd) Exec(c string, args ...string) tea.Cmd {
 	cmd := exec.Command(c, args...)
 	// Inherit environment so $EDITOR is respected
 	cmd.Env = os.Environ()
 	// Attach to the user's terminal
-	cmd.Stdin = os.Stdin
+	// cmd.Stdin = os.Stdin
 	// cmd.Stdout = os.Stdout
 	// cmd.Stderr = os.Stderr
+
+	s.logger.Info("Executing shell command", "command", cmd.String())
 
 	return tea.ExecProcess(cmd, func(err error) tea.Msg {
 		return nil

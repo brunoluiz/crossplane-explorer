@@ -109,7 +109,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				app.New(
 					logger,
 					dumper,
-					kubectl.New(c.String("context"), shell.New()),
+					kubectl.New(c.String("context"), shell.New(logger)),
 					xpnavigator.New(
 						logger,
 						navigator.New(
