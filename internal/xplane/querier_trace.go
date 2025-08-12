@@ -44,7 +44,7 @@ func NewCLITraceQuerier(
 }
 
 func (q *CLITraceQuerier) GetTrace() (*Resource, error) {
-	q.logger.Info("Executing crossplane", "cmd", q.app, "args", q.args)
+	q.logger.Info("executing crossplane", "cmd", q.app, "args", q.args)
 
 	//nolint // trust the user input
 	out, err := exec.Command(q.app, q.args...).CombinedOutput()

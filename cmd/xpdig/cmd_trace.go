@@ -19,7 +19,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/urfave/cli/v3"
 )
 
@@ -37,14 +36,14 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 			&cli.StringFlag{
 				Name:    "log",
 				Aliases: []string{"l"},
-				Usage:   "Log destination (eg: /tmp/logs.txt",
+				Usage:   "Log destination (eg: /tmp/logs.txt)",
 				Value:   "",
 			},
 			&cli.StringFlag{
-				Name:    "dump",
-				Aliases: []string{"du"},
-				Usage:   "Message dump destination (eg: /tmp/dump.txt",
-				Value:   "",
+				Name:    "log-level",
+				Aliases: []string{"ll"},
+				Usage:   "Log level (default: INFO, available: DEBUG, INFO, WARN, ERROR)",
+				Value:   slog.LevelInfo.String(),
 			},
 			&cli.StringFlag{
 				Name:  "cmd",
@@ -71,19 +70,14 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 					return err
 				}
 
-				logger = slog.New(slog.NewJSONHandler(f, &slog.HandlerOptions{}))
-			}
-
-			dumper := func(...any) {}
-			if c.String("dump") != "" {
-				f, err := os.Create(c.String("dump"))
-				if err != nil {
+				var level slog.Level
+				if err = level.UnmarshalText([]byte(c.String("log-level"))); err != nil {
 					return err
 				}
 
-				dumper = func(a ...any) {
-					spew.Fdump(f, a...)
-				}
+				logger = slog.New(slog.NewJSONHandler(f, &slog.HandlerOptions{
+					Level: level,
+				}))
 			}
 
 			tracer, err := getTracer(c, logger)
@@ -91,7 +85,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				return err
 			}
 
-			logger.Info("Starting xpdig", "info", map[string]any{
+			logger.Info("starting xpdig", "info", map[string]any{
 				"version": version,
 				"args":    c.Args().Slice(),
 				"flags": map[string]any{
@@ -108,7 +102,6 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 			program := tea.NewProgram(
 				app.New(
 					logger,
-					dumper,
 					kubectl.New(c.String("context"), shell.New(logger)),
 					xpnavigator.New(
 						logger,
@@ -138,10 +131,6 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 			)
 
 			_, err = program.Run()
-			if err != nil {
-				return err
-			}
-
 			return err
 		},
 	}

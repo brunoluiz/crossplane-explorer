@@ -8,7 +8,7 @@ body:
       value: |
         **🙏 Thanks for taking the time to fill out this bug report.**
 
-        When filling the ticket, try to give as much detail as you can and as well attach logs/dumps from the application. For that you must add `--log ./log.json --dump ./dump` when running `xpdig`.
+        When filling the ticket, try to give as much detail as you can and as well attach logs/dumps from the application. For that you must add `--log ./log.json --log-level debug` when running `xpdig`.
   - type: textarea
     id: description
     attributes:
@@ -41,19 +41,11 @@ body:
     id: logs
     attributes:
       label: "Logs"
-      description: Run the program with `--log ./log.json` and post its output here.
+      description: |
+        Run the program with `--log ./log.json --log-level debug` and post its output here.
+
+        **Be aware it might have domain names since it dumps all crossplane traces when in DEBUG.**
+        If it can be a problem (eg, real traces, not dev ones), drop `--log-level debug` and use `--log-level info` instead.
       render: bash
     validations:
       required: true
-  - type: textarea
-    id: dump
-    attributes:
-      label: "Dump"
-      description: |
-        Run the program with `--dump ./dump.txt` and post its output here.
-
-        **Be aware it might have sensitive data since it dumps all messages, including crossplane traces.**
-        It is not a required field, although it can help.
-      render: bash
-    validations:
-      required: false

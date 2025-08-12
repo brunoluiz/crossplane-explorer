@@ -10,7 +10,7 @@ import (
 )
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	m.dumper("new message", msg)
+	m.logger.Debug("received message", "payload", msg)
 
 	var cmd tea.Cmd
 	switch msg := msg.(type) {

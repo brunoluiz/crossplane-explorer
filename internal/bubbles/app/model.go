@@ -27,7 +27,6 @@ type Model struct {
 	keyMap    KeyMap
 	navigator navigatorpane.Model
 	logger    *slog.Logger
-	dumper    func(...any)
 	kubectl   kubectl
 
 	pane Pane
@@ -38,7 +37,6 @@ type WithOpt func(*Model)
 
 func New(
 	logger *slog.Logger,
-	dumper func(...any),
 	kubectl kubectl,
 	navigatorModel navigatorpane.Model,
 	opts ...WithOpt,
@@ -46,7 +44,6 @@ func New(
 	m := &Model{
 		keyMap:    DefaultKeyMap(),
 		logger:    logger,
-		dumper:    dumper,
 		navigator: navigatorModel,
 		kubectl:   kubectl,
 		pane:      PaneNavigator,
