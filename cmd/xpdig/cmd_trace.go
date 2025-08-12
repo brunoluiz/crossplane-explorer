@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/brunoluiz/xpdig/internal/bubbles/action/kubectl"
@@ -85,6 +86,11 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				}
 			}
 
+			tracer, err := getTracer(c)
+			if err != nil {
+				return err
+			}
+
 			logger.Info("Starting xpdig", map[string]any{
 				"version": version,
 				"args":    c.Args(),
@@ -121,7 +127,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 							textinput.New(),
 						),
 						statusbar.New(),
-						getTracer(c),
+						tracer,
 						xpnavigator.WithWatch(c.Bool("watch")),
 						xpnavigator.WithWatchInterval(c.Duration("watch-interval")),
 						xpnavigator.WithShortColumns(c.Bool("short")),
@@ -131,9 +137,9 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				tea.WithContext(ctx),
 			)
 
-			_, err := program.Run()
+			_, err = program.Run()
 			if err != nil {
-				return fmt.Errorf("exit due to error", err)
+				return err
 			}
 
 			return err
@@ -141,15 +147,36 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 	}
 }
 
-func getTracer(c *cli.Command) xpnavigator.Tracer {
+type ErrInvalidArgument struct{}
+
+func (e *ErrInvalidArgument) Error() string {
+	return fmt.Sprintf("trace for is not possible: argument must be on the format '<kind>/<name>' or '<kind> <name>'")
+}
+
+func getTracer(c *cli.Command) (xpnavigator.Tracer, error) {
 	if c.Bool("stdin") {
-		return xplane.NewReaderTraceQuerier(os.Stdin)
+		return xplane.NewReaderTraceQuerier(os.Stdin), nil
+	}
+
+	var kind, object string
+	switch c.Args().Len() {
+	case 1:
+		n1 := c.Args().First()
+		res := strings.Split(n1, "/")
+		if len(res) != 2 {
+			return nil, &ErrInvalidArgument{}
+		}
+		kind, object = res[0], res[1]
+	case 2:
+		kind, object = c.Args().Get(0), c.Args().Get(1)
+	default:
+		return nil, &ErrInvalidArgument{}
 	}
 
 	return xplane.NewCLITraceQuerier(
 		c.String("cmd"),
 		c.String("namespace"),
 		c.String("context"),
-		c.Args().First(),
-	)
+		kind, object,
+	), nil
 }

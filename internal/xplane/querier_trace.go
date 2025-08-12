@@ -18,7 +18,8 @@ func NewCLITraceQuerier(
 	cmd string,
 	namespace string,
 	context string,
-	name string,
+	kind string,
+	object string,
 ) *CLITraceQuerier {
 	s := strings.Split(cmd, " ")
 	app := s[0]
@@ -30,7 +31,7 @@ func NewCLITraceQuerier(
 	if context != "" && context != "-" {
 		args = append(args, "--context", context)
 	}
-	args = append(args, name)
+	args = append(args, fmt.Sprintf("%s/%s", kind, object))
 
 	return &CLITraceQuerier{
 		app:  app,
