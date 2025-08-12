@@ -8,7 +8,7 @@ body:
       value: |
         **🙏 Thanks for taking the time to fill out this bug report.**
 
-        When filling the ticket, try to give as much detail as you can and as well attach logs/dumps from the application (you must add `--log ./log.json --dump ./dump`).
+        When filling the ticket, try to give as much detail as you can and as well attach logs/dumps from the application. For that you must add `--log ./log.json --dump ./dump` when running `xpdig`.
   - type: textarea
     id: description
     attributes:
