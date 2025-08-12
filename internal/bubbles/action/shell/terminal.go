@@ -29,7 +29,7 @@ func (s *Cmd) Exec(c string, args ...string) tea.Cmd {
 	// cmd.Stdout = os.Stdout
 	// cmd.Stderr = os.Stderr
 
-	return tea.ExecProcess(cmd, func(err error) tea.Msg {
+	return tea.ExecProcess(cmd, func(_ error) tea.Msg {
 		return nil
 	})
 }

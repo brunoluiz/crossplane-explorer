@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"os"
 	"strings"
@@ -24,6 +23,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
+// nolint: funlen
 func cmdTrace() *cli.Command {
 	return &cli.Command{
 		Usage: `Explore tracing from Crossplane. Usage is available through arguments or data stream
@@ -150,7 +150,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 type ErrInvalidArgument struct{}
 
 func (e *ErrInvalidArgument) Error() string {
-	return fmt.Sprintf("trace for is not possible: argument must be on the format '<kind>/<name>' or '<kind> <name>'")
+	return "trace for is not possible: argument must be on the format '<kind>/<name>' or '<kind> <name>'"
 }
 
 func getTracer(c *cli.Command, logger *slog.Logger) (xpnavigator.Tracer, error) {
