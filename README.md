@@ -84,3 +84,6 @@ crossplane beta trace -o json <> | xpdig trace --stdin
 
 Since `k9s` [supports plugins](https://k9scli.io/topics/plugins/), there is a basic configuration that can be
 copied to your own setup in [`k9s.yaml`](./k9s.yaml).
+
+For MacOS users, you can copy the sample file to `~/Library/Application\ Support/k9s/plugins.yaml`,
+while Linux users can copy to `$XDG_CONFIG_HOME/k9s/plugins.yaml`.
