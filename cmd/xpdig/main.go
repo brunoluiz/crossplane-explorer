@@ -13,7 +13,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-var logger *slog.Logger = slog.New(slog.DiscardHandler)
+var logger = slog.New(slog.DiscardHandler)
 
 func cmdMain(cmds ...*cli.Command) *cli.Command {
 	return &cli.Command{
