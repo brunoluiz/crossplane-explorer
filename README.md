@@ -8,15 +8,18 @@
 
 ![demo gif](./demo.gif)
 
-`xpdig` provides a terminal based UI (similar to `k9s`) to interactively explore Crossplane traces,
-making it easier to navigate, debug and understand objects. It leverages `crossplane trace` to render the object tree.
+`xpdig` provides a terminal based UI (similar to `k9s`) to interactively explore
+Crossplane traces,
+making it easier to navigate, debug and understand objects. It leverages
+`crossplane trace` to render the object tree.
 
 ## ✨ Features
 
 ### Trace
 
 - ✨ Expanded details at a glance, with highlight colouring for possible issues
-- 📖 Get, describe, edit and delete objects from the explorer, without the need to separately execute `kubectl`
+- 📖 Get, describe, edit and delete objects from the explorer, without the need
+to separately execute `kubectl`
 - 🔨 Use your own `$PAGER` and `$EDITOR` when exploring the traces
 - 📋 Copy full qualified objects names straight from UI (API group + Kind + name)
 - ♻️ Automatic refresh
@@ -25,13 +28,16 @@ making it easier to navigate, debug and understand objects. It leverages `crossp
 
 ### Dependencies
 
-⚠️ **You must have `crossplane`, `kubectl` and some pager (eg: `less`) installed, since this application runs these within it.**
+⚠️ **You must have `crossplane`, `kubectl` and some pager (eg: `less`)
+installed, since this application runs these within it.**
 
-**The pager used can be customised via `PAGER` in your environment variables (eg: `bat`). It defaults to `less`.**
+**The pager used can be customised via `PAGER` in your environment variables
+(eg, `bat`). It defaults to `less`.**
 
 ### Linux and Windows
 
-[Check the releases section](https://github.com/brunoluiz/xpdig/releases) for more information details.
+[Check the releases section](https://github.com/brunoluiz/xpdig/releases) for
+more information details.
 
 ### MacOS
 
@@ -82,8 +88,18 @@ crossplane beta trace -o json <> | xpdig trace --stdin
 
 ### `k9s` integration
 
-Since `k9s` [supports plugins](https://k9scli.io/topics/plugins/), there is a basic configuration that can be
-copied to your own setup in [`k9s.yaml`](./k9s.yaml).
+Since `k9s` [supports plugins](https://k9scli.io/topics/plugins/), there is a
+basic configuration that can be copied to your own setup in [`k9s.yaml`](./k9s.yaml).
 
 For MacOS users, you can copy the sample file to `~/Library/Application\ Support/k9s/plugins.yaml`,
 while Linux users can copy to `$XDG_CONFIG_HOME/k9s/plugins.yaml`.
+
+### Troubleshooting and debugging
+
+In case the application is misbehaving, enable the logs by adding `--log [dst:./tmp/logs.json]`
+and live tail the file to follow what is happening (eg, `tail -f ./tmp/logs.json`).
+
+If `--log-level debug` is set, it will output all events received by the main
+handler in `bubbles/app`. Bear in mind that this includes all Crossplane
+traces, which might have sensitive metadata, such as: domain specific names,
+labels etc.
