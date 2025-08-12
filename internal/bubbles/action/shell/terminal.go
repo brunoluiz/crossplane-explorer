@@ -19,6 +19,8 @@ func New(logger *slog.Logger) *Cmd {
 }
 
 func (s *Cmd) Exec(c string, args ...string) tea.Cmd {
+	s.logger.Info("Executing shell", "cmd", c, "args", args)
+
 	cmd := exec.Command(c, args...)
 	// Inherit environment so $EDITOR is respected
 	cmd.Env = os.Environ()
@@ -26,8 +28,6 @@ func (s *Cmd) Exec(c string, args ...string) tea.Cmd {
 	// cmd.Stdin = os.Stdin
 	// cmd.Stdout = os.Stdout
 	// cmd.Stderr = os.Stderr
-
-	s.logger.Info("Executing shell command", "command", cmd.String())
 
 	return tea.ExecProcess(cmd, func(err error) tea.Msg {
 		return nil

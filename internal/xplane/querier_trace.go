@@ -4,17 +4,20 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log/slog"
 	"os/exec"
 	"strings"
 )
 
 // CLITraceQuerier defines a trace querier using the crossplane CLI.
 type CLITraceQuerier struct {
-	app  string
-	args []string
+	logger *slog.Logger
+	app    string
+	args   []string
 }
 
 func NewCLITraceQuerier(
+	logger *slog.Logger,
 	cmd string,
 	namespace string,
 	context string,
@@ -34,19 +37,22 @@ func NewCLITraceQuerier(
 	args = append(args, fmt.Sprintf("%s/%s", kind, object))
 
 	return &CLITraceQuerier{
-		app:  app,
-		args: args,
+		logger: logger,
+		app:    app,
+		args:   args,
 	}
 }
 
 func (q *CLITraceQuerier) GetTrace() (*Resource, error) {
+	q.logger.Info("Executing crossplane", "cmd", q.app, "args", q.args)
+
 	//nolint // trust the user input
-	stdout, err := exec.Command(q.app, q.args...).Output()
+	out, err := exec.Command(q.app, q.args...).CombinedOutput()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get trace from CLI: %w", err)
+		return nil, fmt.Errorf("failure while executing '%s %s' (%w):\n%s", q.app, strings.Join(q.args, " "), err, out)
 	}
 
-	return Parse(bytes.NewReader(stdout))
+	return Parse(bytes.NewReader(out))
 }
 
 // ReaderTraceQuerier defines a trace querier using piped files through stdin.

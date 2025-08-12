@@ -86,7 +86,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				}
 			}
 
-			tracer, err := getTracer(c)
+			tracer, err := getTracer(c, logger)
 			if err != nil {
 				return err
 			}
@@ -153,7 +153,7 @@ func (e *ErrInvalidArgument) Error() string {
 	return fmt.Sprintf("trace for is not possible: argument must be on the format '<kind>/<name>' or '<kind> <name>'")
 }
 
-func getTracer(c *cli.Command) (xpnavigator.Tracer, error) {
+func getTracer(c *cli.Command, logger *slog.Logger) (xpnavigator.Tracer, error) {
 	if c.Bool("stdin") {
 		return xplane.NewReaderTraceQuerier(os.Stdin), nil
 	}
@@ -174,6 +174,7 @@ func getTracer(c *cli.Command) (xpnavigator.Tracer, error) {
 	}
 
 	return xplane.NewCLITraceQuerier(
+		logger,
 		c.String("cmd"),
 		c.String("namespace"),
 		c.String("context"),
