@@ -1,0 +1,10 @@
+apiVersion: kubernetes.acme.com/v1alpha1
+kind: ConfigMapClaim
+metadata:
+  name: my-configmap
+  namespace: default
+spec:
+  data:
+    key1: value1
+    key2: value2
+  namespace: test

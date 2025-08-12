@@ -1,0 +1,79 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: xconfigmap-kubernetes
+spec:
+  compositeTypeRef:
+    apiVersion: kubernetes.acme.com/v1alpha1
+    kind: XConfigMap
+  mode: Pipeline
+  pipeline:
+    - step: patch-and-transform
+      functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          - name: namespace
+            base:
+              apiVersion: v1
+              kind: Namespace
+              metadata:
+                name: # patched
+            patches:
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.namespace"
+                toFieldPath: "metadata.name"
+          - name: configmap
+            base:
+              apiVersion: v1
+              kind: ConfigMap
+              metadata:
+                name: example-configmap
+                namespace: # patched
+              data: {}
+            patches:
+              - type: FromCompositeFieldPath
+                fromFieldPath: "metadata.name"
+                toFieldPath: "metadata.name"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.data"
+                toFieldPath: "data"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.namespace"
+                toFieldPath: "metadata.namespace"
+    - step: automatically-detect-readiness
+      functionRef:
+        name: function-auto-ready
+---
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: xconfigmaps.kubernetes.acme.com
+spec:
+  group: kubernetes.acme.com
+  names:
+    kind: XConfigMap
+    plural: xconfigmaps
+  claimNames:
+    kind: ConfigMapClaim
+    plural: configmapclaims
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                data:
+                  type: object
+                  additionalProperties:
+                    type: string
+                namespace:
+                  type: string
+                  default: default
