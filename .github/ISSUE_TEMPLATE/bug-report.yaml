@@ -1,0 +1,60 @@
+name: "🐛 Bug Report"
+description: Create a new ticket for a bug.
+title: "🐛 [BUG] - <title>"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report.
+        When filling the ticket, try to give as much detail as you can and as well attach logs/dumps from
+        the application (you must add `--log ./log.json --dump ./dump`).
+  - type: textarea
+    id: description
+    attributes:
+      label: "Description"
+      description: Please enter an description of your issue
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: reprod
+    attributes:
+      label: "Reproduction steps"
+      description: Enter each step you took until the problem you have seen surfaced
+      value: |
+        1. Run '...'
+        2. Navigate to '....'
+        3. Do '....'
+        4. See error
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: "Screenshots"
+      description: If applicable, add screenshots to help explain your problem.
+      value: |
+        ![DESCRIPTION](LINK.png)
+      render: markdown
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: "Logs"
+      description: Run the program with `--log ./log.json` and post its output here.
+      render: bash
+    validations:
+      required: true
+  - type: textarea
+    id: dump
+    attributes:
+      label: "Logs"
+      description: |
+        Run the program with `--dump ./dump.txt` and post its output here.
+        Be aware it might have sensitive data and it is not fully required.
+      render: bash
+    validations:
+      required: true
