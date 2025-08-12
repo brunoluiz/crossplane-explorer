@@ -81,4 +81,5 @@ type ColumnLayout int
 func (m *Model) setIrrecoverableError(err error) {
 	m.err = err
 	m.pane = PaneIrrecoverableError
+	m.logger.Error("irrecoverable error", "error", m.err)
 }

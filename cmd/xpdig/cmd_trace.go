@@ -51,33 +51,35 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 			},
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
-			tracer, err := getTracer(c, logger)
+			tracer, err := getTracer(c, logger.With("component", "tracer"))
 			if err != nil {
 				return err
 			}
 
-			logger.Info("starting xpdig", "info", map[string]any{
-				"version": version,
-				"args":    c.Args().Slice(),
-				"flags": map[string]any{
-					"cmd":            c.String("cmd"),
-					"context":        c.String("context"),
-					"namespace":      c.String("namespace"),
-					"stdin":          c.Bool("stdin"),
-					"short":          c.Bool("short"),
-					"watch":          c.Bool("watch"),
-					"watch-interval": c.Duration("watch-interval"),
-				},
-			})
+			logger.Info("starting xpdig",
+				"component", "main",
+				"info", map[string]any{
+					"version": version,
+					"args":    c.Args().Slice(),
+					"flags": map[string]any{
+						"cmd":            c.String("cmd"),
+						"context":        c.String("context"),
+						"namespace":      c.String("namespace"),
+						"stdin":          c.Bool("stdin"),
+						"short":          c.Bool("short"),
+						"watch":          c.Bool("watch"),
+						"watch-interval": c.Duration("watch-interval"),
+					},
+				})
 
 			program := tea.NewProgram(
 				app.New(
-					logger,
-					kubectl.New(c.String("context"), shell.New(logger)),
+					logger.With("component", "bubbles/app"),
+					kubectl.New(c.String("context"), shell.New(logger.With("component", "bubbles/action/shell"))),
 					xpnavigator.New(
-						logger,
+						logger.With("component", "bubbles/layout/xpnavigator"),
 						navigator.New(
-							logger,
+							logger.With("component", "bubbles/component/navigator"),
 							table.New(
 								table.WithFocused(true),
 								table.WithStyles(func() table.Styles {
