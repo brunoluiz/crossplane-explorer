@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
 	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/urfave/cli/v3"
 )
 
@@ -69,6 +71,9 @@ func main() {
 		cmdTrace(),
 		cmdVersion(),
 	).Run(ctx, os.Args); err != nil {
-		log.Println(err)
+		if !errors.Is(err, tea.ErrInterrupted) {
+			log.Println(err)
+			logger.Error("application exited with error", "error", err)
+		}
 	}
 }
