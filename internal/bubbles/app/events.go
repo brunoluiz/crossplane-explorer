@@ -84,6 +84,11 @@ func (m *Model) onKey(msg tea.KeyMsg) tea.Cmd {
 	switch {
 	case key.Matches(msg, m.keyMap.Quit):
 		return tea.Interrupt
+	// Only used in case there was a failure that requires an exit
+	case key.Matches(msg, m.keyMap.FailQuit):
+		if m.err != nil {
+			return tea.Interrupt
+		}
 	}
 
 	return nil

@@ -68,7 +68,7 @@ func (m Model) Init() tea.Cmd {
 func (m Model) View() string {
 	switch m.pane {
 	case PaneIrrecoverableError:
-		return fmt.Sprintf("There was a fatal error: %s\nPress q to exit", m.err.Error())
+		return fmt.Sprintf("There was a fatal error:\n%s\nPress q to exit", m.err.Error())
 	case PaneNavigator:
 		return lipgloss.JoinVertical(
 			lipgloss.Left,
