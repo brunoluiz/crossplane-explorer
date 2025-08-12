@@ -25,7 +25,7 @@ func (*Cmd) Exec(c string, args ...string) tea.Cmd {
 	// cmd.Stderr = os.Stderr
 
 	return tea.ExecProcess(cmd, func(err error) tea.Msg {
-		return err
+		return fmt.Errorf("failure to execute shell command: %w", err)
 	})
 }
 

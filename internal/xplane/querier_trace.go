@@ -2,6 +2,7 @@ package xplane
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os/exec"
 	"strings"
@@ -41,7 +42,7 @@ func (q *CLITraceQuerier) GetTrace() (*Resource, error) {
 	//nolint // trust the user input
 	stdout, err := exec.Command(q.app, q.args...).Output()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get trace from CLI: %w", err)
 	}
 
 	return Parse(bytes.NewReader(stdout))

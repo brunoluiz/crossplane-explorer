@@ -114,7 +114,7 @@ func (m Model) getTrace() tea.Cmd {
 	return func() tea.Msg {
 		res, err := m.tracer.GetTrace()
 		if err != nil {
-			return err
+			return fmt.Errorf("failure while getting traces: %w", err)
 		}
 		return res
 	}
