@@ -34,18 +34,6 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 		Aliases: []string{"t"},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:    "log",
-				Aliases: []string{"l"},
-				Usage:   "Log destination (eg: /tmp/logs.txt)",
-				Value:   "",
-			},
-			&cli.StringFlag{
-				Name:    "log-level",
-				Aliases: []string{"ll"},
-				Usage:   "Log level (default: INFO, available: DEBUG, INFO, WARN, ERROR)",
-				Value:   slog.LevelInfo.String(),
-			},
-			&cli.StringFlag{
 				Name:  "cmd",
 				Usage: "Which binary should it use to generate the JSON trace",
 				Value: "crossplane beta trace -o json",
@@ -63,23 +51,6 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 			},
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
-			logger := slog.New(slog.DiscardHandler)
-			if c.String("log") != "" {
-				f, err := os.Create(c.String("log"))
-				if err != nil {
-					return err
-				}
-
-				var level slog.Level
-				if err = level.UnmarshalText([]byte(c.String("log-level"))); err != nil {
-					return err
-				}
-
-				logger = slog.New(slog.NewJSONHandler(f, &slog.HandlerOptions{
-					Level: level,
-				}))
-			}
-
 			tracer, err := getTracer(c, logger)
 			if err != nil {
 				return err
