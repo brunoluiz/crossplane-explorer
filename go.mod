@@ -10,7 +10,6 @@ require (
 	github.com/charmbracelet/x/ansi v0.10.1
 	github.com/crossplane/crossplane v1.20.1
 	github.com/crossplane/crossplane-runtime v1.20.0
-	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/google/go-containerregistry v0.20.6
 	github.com/mattn/go-runewidth v0.0.16
 	github.com/mistakenelf/teacup v0.4.1
@@ -26,6 +25,7 @@ require (
 	github.com/charmbracelet/colorprofile v0.3.1 // indirect
 	github.com/charmbracelet/x/cellbuf v0.0.13 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/emicklei/go-restful/v3 v3.12.1 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
 	github.com/evanphx/json-patch/v5 v5.9.0 // indirect
