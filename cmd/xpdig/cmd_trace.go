@@ -71,7 +71,7 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 					return err
 				}
 
-				logger = slog.New(slog.NewTextHandler(f, &slog.HandlerOptions{}))
+				logger = slog.New(slog.NewJSONHandler(f, &slog.HandlerOptions{}))
 			}
 
 			dumper := func(...any) {}
@@ -91,9 +91,9 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				return err
 			}
 
-			logger.Info("Starting xpdig", map[string]any{
+			logger.Info("Starting xpdig", "info", map[string]any{
 				"version": version,
-				"args":    c.Args(),
+				"args":    c.Args().Slice(),
 				"flags": map[string]any{
 					"cmd":            c.String("cmd"),
 					"context":        c.String("context"),
