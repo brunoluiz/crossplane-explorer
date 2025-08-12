@@ -21,11 +21,11 @@ func (*Cmd) Exec(c string, args ...string) tea.Cmd {
 	cmd.Env = os.Environ()
 	// Attach to the user's terminal
 	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
+	// cmd.Stdout = os.Stdout
 	// cmd.Stderr = os.Stderr
 
 	return tea.ExecProcess(cmd, func(err error) tea.Msg {
-		return fmt.Errorf("failure to execute shell command: %w", err)
+		return nil
 	})
 }
 
