@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 	"time"
@@ -84,6 +85,20 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				}
 			}
 
+			logger.Info("Starting xpdig", map[string]any{
+				"version": version,
+				"args":    c.Args(),
+				"flags": map[string]any{
+					"cmd":            c.String("cmd"),
+					"context":        c.String("context"),
+					"namespace":      c.String("namespace"),
+					"stdin":          c.Bool("stdin"),
+					"short":          c.Bool("short"),
+					"watch":          c.Bool("watch"),
+					"watch-interval": c.Duration("watch-interval"),
+				},
+			})
+
 			program := tea.NewProgram(
 				app.New(
 					logger,
@@ -117,6 +132,10 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 			)
 
 			_, err := program.Run()
+			if err != nil {
+				return fmt.Errorf("exit due to error", err)
+			}
+
 			return err
 		},
 	}
