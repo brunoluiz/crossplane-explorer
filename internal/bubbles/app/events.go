@@ -1,6 +1,10 @@
 package app
 
 import (
+	"context"
+	"log/slog"
+	"reflect"
+
 	"github.com/atotto/clipboard"
 	"github.com/brunoluiz/xpdig/internal/bubbles/component/navigator"
 	"github.com/brunoluiz/xpdig/internal/ds"
@@ -10,7 +14,13 @@ import (
 )
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	m.logger.Debug("received message", "payload", msg)
+	// NOTE: this is verbose and we don't want to do reflections if not in DEBUG
+	if m.logger.Enabled(context.Background(), slog.LevelDebug) {
+		m.logger.Debug("received update", "message", map[string]any{
+			"type":    reflect.TypeOf(msg).String(),
+			"payload": msg,
+		})
+	}
 
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
