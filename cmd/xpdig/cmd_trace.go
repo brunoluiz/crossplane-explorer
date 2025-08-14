@@ -50,63 +50,58 @@ Live mode is only available for (1) through the use of --watch / --watch-interva
 				Value:   5 * time.Second,
 			},
 		},
-		Action: func(ctx context.Context, c *cli.Command) error {
-			tracer, err := getTracer(c, logger.With("component", "tracer"))
-			if err != nil {
-				return err
-			}
-
-			logger.Info("starting xpdig",
-				"component", "main",
-				"info", map[string]any{
-					"version": version,
-					"args":    c.Args().Slice(),
-					"flags": map[string]any{
-						"cmd":            c.String("cmd"),
-						"context":        c.String("context"),
-						"namespace":      c.String("namespace"),
-						"stdin":          c.Bool("stdin"),
-						"short":          c.Bool("short"),
-						"watch":          c.Bool("watch"),
-						"watch-interval": c.Duration("watch-interval"),
-					},
-				})
-
-			program := tea.NewProgram(
-				app.New(
-					logger.With("component", "bubbles/app"),
-					kubectl.New(c.String("context"), shell.New(logger.With("component", "bubbles/action/shell"))),
-					xpnavigator.New(
-						logger.With("component", "bubbles/layout/xpnavigator"),
-						navigator.New(
-							logger.With("component", "bubbles/component/navigator"),
-							table.New(
-								table.WithFocused(true),
-								table.WithStyles(func() table.Styles {
-									s := table.DefaultStyles()
-									s.Selected = lipgloss.NewStyle().
-										Foreground(lipgloss.ANSIColor(ansi.Black)).
-										Background(lipgloss.ANSIColor(ansi.White))
-									return s
-								}()),
-							),
-							textinput.New(),
-						),
-						statusbar.New(),
-						tracer,
-						xpnavigator.WithWatch(c.Bool("watch")),
-						xpnavigator.WithWatchInterval(c.Duration("watch-interval")),
-						xpnavigator.WithShortColumns(c.Bool("short")),
-					),
-				),
-				tea.WithAltScreen(),
-				tea.WithContext(ctx),
-			)
-
-			_, err = program.Run()
-			return err
-		},
+		Action: runTrace,
 	}
+}
+
+func runTrace(ctx context.Context, c *cli.Command) error {
+	tracer, err := getTracer(c, logger.With("component", "tracer"))
+	if err != nil {
+		return err
+	}
+
+	// FIXME: use c.Flags() to get all of them
+	logger.Info("starting xpdig",
+		"component", "main",
+		"info", map[string]any{
+			"version": version,
+			"args":    c.Args().Slice(),
+			"flags":   getFlags(c),
+		})
+
+	program := tea.NewProgram(
+		app.New(
+			logger.With("component", "bubbles/app"),
+			kubectl.New(c.String("context"), shell.New(logger.With("component", "bubbles/action/shell"))),
+			xpnavigator.New(
+				logger.With("component", "bubbles/layout/xpnavigator"),
+				navigator.New(
+					logger.With("component", "bubbles/component/navigator"),
+					table.New(
+						table.WithFocused(true),
+						table.WithStyles(func() table.Styles {
+							s := table.DefaultStyles()
+							s.Selected = lipgloss.NewStyle().
+								Foreground(lipgloss.ANSIColor(ansi.Black)).
+								Background(lipgloss.ANSIColor(ansi.White))
+							return s
+						}()),
+					),
+					textinput.New(),
+				),
+				statusbar.New(),
+				tracer,
+				xpnavigator.WithWatch(c.Bool("watch")),
+				xpnavigator.WithWatchInterval(c.Duration("watch-interval")),
+				xpnavigator.WithShortColumns(c.Bool("short")),
+			),
+		),
+		tea.WithAltScreen(),
+		tea.WithContext(ctx),
+	)
+
+	_, err = program.Run()
+	return err
 }
 
 type ErrInvalidArgument struct{}

@@ -56,6 +56,14 @@ func cmdMain(cmds ...*cli.Command) *cli.Command {
 	}
 }
 
+func getFlags(c *cli.Command) map[string]any {
+	flags := make(map[string]any)
+	for _, f := range c.Flags {
+		flags[f.Names()[0]] = f.Get()
+	}
+	return flags
+}
+
 func main() {
 	ctx, stop := signal.NotifyContext(
 		context.Background(),
